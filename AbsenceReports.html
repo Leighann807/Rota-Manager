@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      .container {
+        padding: 15px;
+        font-family: Arial, sans-serif;
+      }
+      
+      h3 {
+        margin-top: 0;
+        margin-bottom: 15px;
+      }
+      
+      .tabs {
+        display: flex;
+        border-bottom: 1px solid #ddd;
+        margin-bottom: 15px;
+      }
+      
+      .tab {
+        padding: 8px 15px;
+        cursor: pointer;
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
+        border-bottom: none;
+        border-radius: 4px 4px 0 0;
+        margin-right: 3px;
+      }
+      
+      .tab.active {
+        background-color: white;
+        border-bottom: 1px solid white;
+        margin-bottom: -1px;
+        font-weight: bold;
+      }
+      
+      .tab-content {
+        display: none;
+      }
+      
+      .tab-content.active {
+        display: block;
+      }
+      
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 15px;
+      }
+      
+      th, td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+      
+      th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+      }
+      
+      tr:hover {
+        background-color: #f5f5f5;
+      }
+      
+      .chart-container {
+        margin-top: 15px;
+        height: 200px;
+        position: relative;
+      }
+      
+      .bar {
+        position: absolute;
+        bottom: 0;
+        width: 30px;
+        background-color: #4285f4;
+        transition: height 0.5s ease;
+        border-radius: 3px 3px 0 0;
+      }
+      
+      .bar-label {
+        position: absolute;
+        bottom: -20px;
+        width: 30px;
+        text-align: center;
+        font-size: 11px;
+      }
+      
+      .bar-value {
+        position: absolute;
+        top: -20px;
+        width: 30px;
+        text-align: center;
+        font-size: 11px;
+      }
+      
+      .no-data {
+        text-align: center;
+        padding: 30px;
+        color: #666;
+        font-style: italic;
+      }
+      
+      .staff-summary {
+        margin-bottom: 10px;
+        padding: 10px;
+        border: 1px solid #eee;
+        border-radius: 4px;
+      }
+      
+      .staff-name {
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+      
+      .absence-stats {
+        display: flex;
+        justify-content: space-between;
+      }
+      
+      .stat {
+        text-align: center;
+        flex: 1;
+      }
+      
+      .stat-value {
+        font-size: 18px;
+        font-weight: bold;
+      }
+      
+      .stat-label {
+        font-size: 11px;
+        color: #666;
+      }
+      
+      .refresh-button {
+        float: right;
+        padding: 5px 10px;
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+      
+      .refresh-button:hover {
+        background-color: #e0e0e0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h3>Absence Reports</h3>
+        <button class="refresh-button" id="refreshButton">↻ Refresh</button>
+      </div>
+      
+      <div class="tabs">
+        <div class="tab active" data-tab="summary">Summary</div>
+        <div class="tab" data-tab="staff">By Staff</div>
+        <div class="tab" data-tab="chart">Chart View</div>
+      </div>
+      
+      <div id="summaryTab" class="tab-content active">
+        <table>
+          <thead>
+            <tr>
+              <th>Staff Member</th>
+              <th>Annual Leave</th>
+              <th>Sick Days</th>
+              <th>Training</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody id="summaryTableBody">
+            <tr>
+              <td colspan="5" class="no-data">Loading data...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div id="staffTab" class="tab-content">
+        <div id="staffContainer">
+          <div class="no-data">Loading data...</div>
+        </div>
+      </div>
+      
+      <div id="chartTab" class="tab-content">
+        <div id="chartContainer" class="chart-container">
+          <div class="no-data">Loading data...</div>
+        </div>
+        <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #666;">
+          Total Absences per Staff Member
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      // Global variables
+      let absenceData = [];
+      
+      // Initialize the page
+      document.addEventListener('DOMContentLoaded', function() {
+        // Set up tab navigation
+        setupTabs();
+        
+        // Load absence data
+        loadAbsenceData();
+        
+        // Set up refresh button
+        document.getElementById('refreshButton').addEventListener('click', loadAbsenceData);
+      });
+      
+      // Set up tab navigation
+      function setupTabs() {
+        const tabs = document.querySelectorAll('.tab');
+        
+        tabs.forEach(function(tab) {
+          tab.addEventListener('click', function() {
+            // Remove active class from all tabs
+            tabs.forEach(function(t) {
+              t.classList.remove('active');
+            });
+            
+            // Add active class to clicked tab
+            this.classList.add('active');
+            
+            // Hide all tab content
+            document.querySelectorAll('.tab-content').forEach(function(content) {
+              content.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            const tabId = this.getAttribute('data-tab') + 'Tab';
+            document.getElementById(tabId).classList.add('active');
+          });
+        });
+      }
+      
+      // Load absence data
+      function loadAbsenceData() {
+        // Show loading indicators
+        document.getElementById('summaryTableBody').innerHTML = '<tr><td colspan="5" class="no-data">Loading data...</td></tr>';
+        document.getElementById('staffContainer').innerHTML = '<div class="no-data">Loading data...</div>';
+        document.getElementById('chartContainer').innerHTML = '<div class="no-data">Loading data...</div>';
+        
+        // Call server function
+        google.script.run
+          .withSuccessHandler(function(data) {
+            absenceData = data;
+            
+            // Update all views
+            updateSummaryTable();
+            updateStaffView();
+            updateChartView();
+          })
+          .withFailureHandler(function(error) {
+            showError(error);
+          })
+          .getAbsenceStats();
+      }
+      
+      // Update the summary table
+      function updateSummaryTable() {
+        const tableBody = document.getElementById('summaryTableBody');
+        
+        if (absenceData.length === 0) {
+          tableBody.innerHTML = '<tr><td colspan="5" class="no-data">No absence data found</td></tr>';
+          return;
+        }
+        
+        tableBody.innerHTML = '';
+        
+        absenceData.forEach(function(staff) {
+          const row = document.createElement('tr');
+          
+          row.innerHTML = `
+            <td>${staff.name}</td>
+            <td>${staff.annualLeave}</td>
+            <td>${staff.sick}</td>
+            <td>${staff.training}</td>
+            <td>${staff.total}</td>
+          `;
+          
+          tableBody.appendChild(row);
+        });
+      }
+      
+      // Update the staff view
+      function updateStaffView() {
+        const container = document.getElementById('staffContainer');
+        
+        if (absenceData.length === 0) {
+          container.innerHTML = '<div class="no-data">No absence data found</div>';
+          return;
+        }
+        
+        container.innerHTML = '';
+        
+        absenceData.forEach(function(staff) {
+          const staffElement = document.createElement('div');
+          staffElement.className = 'staff-summary';
+          
+          staffElement.innerHTML = `
+            <div class="staff-name">${staff.name}</div>
+            <div class="absence-stats">
+              <div class="stat">
+                <div class="stat-value">${staff.annualLeave}</div>
+                <div class="stat-label">Annual Leave</div>
+              </div>
+              <div class="stat">
+                <div class="stat-value">${staff.sick}</div>
+                <div class="stat-label">Sick Days</div>
+              </div>
+              <div class="stat">
+                <div class="stat-value">${staff.training}</div>
+                <div class="stat-label">Training</div>
+              </div>
+              <div class="stat">
+                <div class="stat-value">${staff.total}</div>
+                <div class="stat-label">Total</div>
+              </div>
+            </div>
+          `;
+          
+          container.appendChild(staffElement);
+        });
+      }
+      
+      // Update the chart view
+      function updateChartView() {
+        const container = document.getElementById('chartContainer');
+        
+        if (absenceData.length === 0) {
+          container.innerHTML = '<div class="no-data">No absence data found</div>';
+          return;
+        }
+        
+        container.innerHTML = '';
+        
+        // Find max value for scaling
+        const maxValue = Math.max(...absenceData.map(staff => staff.total));
+        
+        // Chart height (minus space for labels)
+        const chartHeight = 180;
+        
+        // Bar width and spacing
+        const barWidth = 30;
+        const spacing = 20;
+        
+        // Draw bars for each staff member
+        absenceData.forEach(function(staff, index) {
+          const barHeight = staff.total / maxValue * chartHeight;
+          
+          const bar = document.createElement('div');
+          bar.className = 'bar';
+          bar.style.left = (index * (barWidth + spacing) + 10) + 'px';
+          bar.style.height = barHeight + 'px';
+          
+          // Color based on absence type distribution
+          if (staff.sick > staff.annualLeave && staff.sick > staff.training) {
+            bar.style.backgroundColor = '#ea9999'; // Sick leave dominant color
+          } else if (staff.annualLeave > staff.training) {
+            bar.style.backgroundColor = '#b4a7d6'; // Annual leave dominant color
+          } else if (staff.training > 0) {
+            bar.style.backgroundColor = '#9fc5e8'; // Training dominant color
+          }
+          
+          const barLabel = document.createElement('div');
+          barLabel.className = 'bar-label';
+          barLabel.style.left = (index * (barWidth + spacing) + 10) + 'px';
+          barLabel.textContent = staff.name.split(' ')[0]; // First name only
+          
+          const barValue = document.createElement('div');
+          barValue.className = 'bar-value';
+          barValue.style.left = (index * (barWidth + spacing) + 10) + 'px';
+          barValue.textContent = staff.total;
+          
+          container.appendChild(bar);
+          container.appendChild(barLabel);
+          container.appendChild(barValue);
+        });
+        
+        // Set container width based on number of bars
+        container.style.width = (absenceData.length * (barWidth + spacing) + 10) + 'px';
+      }
+      
+      // Show error
+      function showError(error) {
+        console.error('Error:', error);
+        
+        document.getElementById('summaryTableBody').innerHTML = 
+          `<tr><td colspan="5" class="no-data">Error loading data: ${error.message || 'Unknown error'}</td></tr>`;
+        
+        document.getElementById('staffContainer').innerHTML = 
+          `<div class="no-data">Error loading data: ${error.message || 'Unknown error'}</div>`;
+        
+        document.getElementById('chartContainer').innerHTML = 
+          `<div class="no-data">Error loading data: ${error.message || 'Unknown error'}</div>`;
+      }
+    </script>
+  </body>
+</html> 

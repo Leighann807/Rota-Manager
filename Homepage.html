@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        min-height: 280px;
+        box-sizing: border-box;
+      }
+      
+      .container {
+        text-align: center;
+        max-width: 350px;
+        margin: 0 auto;
+      }
+      
+      h1 {
+        margin: 0 0 10px 0;
+        font-size: 24px;
+        font-weight: bold;
+      }
+      
+      .subtitle {
+        font-size: 14px;
+        opacity: 0.9;
+        margin-bottom: 25px;
+      }
+      
+      .features {
+        text-align: left;
+        margin: 20px 0;
+        font-size: 14px;
+      }
+      
+      .features ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      
+      .features li {
+        margin: 8px 0;
+        padding-left: 20px;
+        position: relative;
+      }
+      
+      .features li::before {
+        content: "✓";
+        position: absolute;
+        left: 0;
+        color: #4ade80;
+        font-weight: bold;
+      }
+      
+      .action-buttons {
+        margin-top: 25px;
+      }
+      
+      .btn {
+        display: inline-block;
+        padding: 12px 20px;
+        margin: 5px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+      }
+      
+      .btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+      
+      .btn-primary {
+        background: rgba(66, 133, 244, 0.8);
+        border-color: rgba(66, 133, 244, 0.9);
+      }
+      
+      .btn-primary:hover {
+        background: rgba(66, 133, 244, 1);
+      }
+      
+      .version {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 12px;
+        opacity: 0.7;
+      }
+      
+      .status-indicator {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background: #4ade80;
+        border-radius: 50%;
+        margin-right: 8px;
+        animation: pulse 2s infinite;
+      }
+      
+      @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+      }
+      
+      .footer {
+        margin-top: 20px;
+        font-size: 12px;
+        opacity: 0.8;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="version">v2.0</div>
+    
+    <div class="container">
+      <h1>📋 Staff Rota Manager</h1>
+      <div class="subtitle">
+        <span class="status-indicator"></span>
+        Simplified staff scheduling for Google Sheets
+      </div>
+      
+      <div class="features">
+        <ul>
+          <li>Create monthly rota sheets</li>
+          <li>Apply shift patterns automatically</li>
+          <li>Track absences and holidays</li>
+          <li>Generate comprehensive reports</li>
+          <li>Color-coded shift visualization</li>
+        </ul>
+      </div>
+      
+      <div class="action-buttons">
+        <button class="btn btn-primary" onclick="createNewRota()">
+          🆕 Create New Rota
+        </button>
+        <button class="btn" onclick="openQuickAssign()">
+          ⚡ Quick Assign
+        </button>
+        <button class="btn" onclick="viewReports()">
+          📊 View Reports
+        </button>
+        <button class="btn" onclick="openHelp()">
+          ❓ Help
+        </button>
+      </div>
+      
+      <div class="footer">
+        <div>🔒 Your data stays secure in Google Sheets</div>
+        <div style="margin-top: 5px;">
+          <a href="#" onclick="showPrivacy()" style="color: rgba(255,255,255,0.8); font-size: 11px;">Privacy Policy</a>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      function createNewRota() {
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result && result.success) {
+              showMessage('Rota sheet created successfully!', 'success');
+            }
+          })
+          .withFailureHandler(function(error) {
+            showMessage('Error creating rota: ' + error.message, 'error');
+          })
+          .createRotaSheet();
+      }
+      
+      function openQuickAssign() {
+        google.script.run.showQuickAssign();
+      }
+      
+      function viewReports() {
+        google.script.run.showAbsenceReports();
+      }
+      
+      function openHelp() {
+        google.script.run.showHelp();
+      }
+      
+      function showPrivacy() {
+        google.script.run.showPrivacyPolicy();
+      }
+      
+      function showMessage(message, type) {
+        // Simple message display
+        const messageDiv = document.createElement('div');
+        messageDiv.textContent = message;
+        messageDiv.style.cssText = `
+          position: fixed;
+          top: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          padding: 10px 20px;
+          background: ${type === 'success' ? '#4ade80' : '#f87171'};
+          color: white;
+          border-radius: 6px;
+          font-size: 14px;
+          z-index: 1000;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        `;
+        
+        document.body.appendChild(messageDiv);
+        
+        setTimeout(() => {
+          messageDiv.remove();
+        }, 3000);
+      }
+      
+      // Initialize homepage
+      document.addEventListener('DOMContentLoaded', function() {
+        // Log homepage view
+        google.script.run.logUsage('homepage_viewed');
+      });
+    </script>
+  </body>
+</html>

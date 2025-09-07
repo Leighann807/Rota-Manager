@@ -1,0 +1,3492 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      
+      body, html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+      }
+      
+      .container {
+        padding: 40px;
+        font-family: Arial, sans-serif;
+        width: 100%; /* Changed from 90% to 100% to fill the window */
+        margin: 0 auto;
+        min-height: 100vh;
+        box-sizing: border-box;
+        display: flex; /* Make it a flex container */
+        flex-direction: column; /* Stack children vertically */
+        align-items: center; /* Center children horizontally */
+      }
+      
+      .main-layout {
+        display: flex;
+        gap: 20px; /* Adjusted gap for better spacing */
+        margin-top: 20px;
+        width: 100%;
+      }
+      
+      .left-column {
+        flex: 2;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        width: 100%; /* Explicitly set width to ensure it fills available flex space */
+      }
+      
+      .right-column {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        width: 100%; /* Explicitly set width to ensure it fills available flex space */
+      }
+      
+      h3 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-size: 28px;
+        color: #2d3748;
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #f8f9ff 0%, #f1f3ff 100%);
+        border-radius: 16px;
+        border: 2px solid #e8ecff;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+      }
+      
+      .section {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+        width: 100%; /* Ensure sections take full width of their column */
+        overflow: visible;
+      }
+      
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        text-align: left; /* Changed from center to left */
+      }
+      
+      select, input {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+      
+      .pattern-select {
+        margin-bottom: 10px;
+      }
+      
+      .pattern-preview {
+        display: flex;
+        margin-top: 10px;
+        flex-wrap: wrap;
+        background-color: #f9f9f9;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #eee;
+        min-height: 35px;
+      }
+      
+      .pattern-day {
+        width: 40px;
+        height: 25px;
+        margin: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        border-radius: 3px;
+      }
+      
+      .button-container {
+        margin-top: 20px;
+        text-align: right;
+      }
+      
+      button {
+        padding: 8px 15px;
+        background-color: #4285f4;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      
+      button:hover {
+        background-color: #3367d6;
+      }
+      
+      button:disabled {
+        background-color: #a9a9a9;
+        cursor: not-allowed;
+      }
+      
+      .pattern-input {
+        width: 100%;
+        padding: 8px;
+        font-family: monospace;
+      }
+      
+      .info-text {
+        font-size: 12px;
+        color: #666;
+        margin-top: 5px;
+      }
+      
+      .status-message {
+        margin-top: 15px;
+        padding: 10px;
+        border-radius: 4px;
+        display: block;
+        font-weight: bold;
+        transition: opacity 0.5s ease;
+      }
+      
+      .success {
+        background-color: #d6f5d6;
+        color: #2e7d32;
+        border-left: 4px solid #2e7d32;
+      }
+      
+      .error {
+        background-color: #ffcdd2;
+        color: #c62828;
+        border-left: 4px solid #c62828;
+      }
+      
+      .info {
+        background-color: #e1f5fe;
+        color: #0277bd;
+        border-left: 4px solid #0277bd;
+      }
+      
+      /* Spinner for loading state */
+      .spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 3px solid rgba(0, 0, 0, 0.2);
+        border-top-color: #0277bd;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 8px;
+        vertical-align: middle;
+      }
+      
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+      
+      /* Status icons */
+      .success-icon, .error-icon, .info-icon {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        line-height: 18px;
+        text-align: center;
+        border-radius: 50%;
+        margin-right: 8px;
+        font-weight: bold;
+      }
+      
+      /* Section-specific message areas */
+      .section-message {
+        margin-top: 12px;
+        padding: 8px 12px;
+        border-radius: 6px;
+        display: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border-left: 4px solid;
+      }
+      
+      .section-message.success {
+        background-color: #f0f9f4;
+        color: #166534;
+        border-left-color: #16a34a;
+      }
+      
+      .section-message.error {
+        background-color: #fef2f2;
+        color: #dc2626;
+        border-left-color: #dc2626;
+      }
+
+      /* New Single-Month Interface Styles */
+      .month-selection-container {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 15px;
+      }
+
+      .month-selection-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+
+      .month-input-group {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .month-input-group label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+        font-size: 14px;
+      }
+
+      .month-year-selector {
+        display: flex;
+        gap: 10px;
+      }
+
+      .month-dropdown, .year-dropdown {
+        flex: 1;
+        padding: 12px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 14px;
+        background: white;
+        transition: border-color 0.2s ease;
+      }
+
+      .month-dropdown:focus, .year-dropdown:focus {
+        outline: none;
+        border-color: #4285f4;
+        box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+      }
+
+      .date-range-input-group {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .day-range-selector {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .day-input {
+        width: 70px;
+        padding: 12px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        text-align: center;
+        font-size: 14px;
+        background: white;
+        transition: border-color 0.2s ease;
+      }
+
+      .day-input:focus {
+        outline: none;
+        border-color: #4285f4;
+        box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+      }
+
+      .day-separator {
+        color: #6c757d;
+        font-weight: 500;
+      }
+
+      .day-range-help {
+        color: #6c757d;
+        font-size: 12px;
+        margin-top: 5px;
+        font-style: italic;
+      }
+
+      .month-preview-card {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        padding: 16px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      }
+
+      .preview-header {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 10px;
+        font-size: 14px;
+      }
+
+      .month-preview-content {
+        font-size: 16px;
+        color: #212529;
+        font-weight: 500;
+        margin-bottom: 15px;
+        padding: 8px 12px;
+        background: #e7f3ff;
+        border-radius: 6px;
+        text-align: center;
+      }
+
+      .quick-month-buttons {
+        display: flex;
+        gap: 8px;
+      }
+
+      .quick-month-btn {
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: white;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 12px;
+      }
+
+      .quick-month-btn:hover {
+        background: #4285f4;
+        color: white;
+        border-color: #4285f4;
+      }
+
+      .multi-month-notice {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 15px;
+      }
+
+      .notice-icon {
+        font-size: 18px;
+        margin-top: 2px;
+      }
+
+      .notice-content {
+        color: #856404;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .notice-content strong {
+        color: #533301;
+      }
+
+      /* Enhanced Button Styles */
+      .button-container {
+        display: flex;
+        gap: 12px;
+        margin-top: 25px;
+        flex-wrap: wrap;
+      }
+
+      .action-btn {
+        padding: 14px 20px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 120px;
+        justify-content: center;
+      }
+
+      .test-btn {
+        background: #28a745;
+        color: white;
+      }
+
+      .test-btn:hover {
+        background: #218838;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+      }
+
+      .create-btn {
+        background: #17a2b8;
+        color: white;
+      }
+
+      .create-btn:hover {
+        background: #138496;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
+      }
+
+      .primary-btn {
+        background: linear-gradient(135deg, #4285f4 0%, #3367d6 100%);
+        color: white;
+        font-size: 15px;
+        min-width: 180px;
+      }
+
+      .primary-btn:hover {
+        background: linear-gradient(135deg, #3367d6 0%, #2a56c6 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(66, 133, 244, 0.4);
+      }
+
+      .action-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+        box-shadow: none !important;
+      }
+      
+      .section-message.loading {
+        background-color: #fef9c3;
+        color: #a16207;
+        border-left-color: #eab308;
+      }
+      
+      /* Loading spinner for sections */
+      .section-spinner {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 2px solid rgba(0, 0, 0, 0.1);
+        border-top-color: #a16207;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 8px;
+        vertical-align: middle;
+      }
+      
+      .success-icon {
+        background-color: #2e7d32;
+        color: white;
+      }
+      
+      .error-icon {
+        background-color: #c62828;
+        color: white;
+      }
+      
+      .info-icon {
+        background-color: #0277bd;
+        color: white;
+      }
+      
+      /* Add styles for shift buttons */
+      .shift-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 75px;
+        height: 32px;
+        margin: 3px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: bold;
+        text-align: center;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+        transition: all 0.2s ease;
+        user-select: none;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+      
+      .shift-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      }
+      
+      .shift-button:active {
+        transform: translateY(0px);
+      }
+      
+      /* Shift card action buttons */
+      .shift-card-actions {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.9);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 10;
+        pointer-events: none;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+        padding: 12px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+      }
+      
+      .shift-card:hover .shift-card-actions {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translate(-50%, -50%) scale(1);
+      }
+      
+      .card-action-btn {
+        background: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        min-width: 80px;
+        text-align: center;
+      }
+      
+      .customize-btn {
+        background: #1976d2;
+        color: white;
+        border: 1px solid #1976d2;
+      }
+      
+      .customize-btn:hover {
+        box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+      }
+      
+      .remove-btn {
+        background: #d32f2f;
+        color: white;
+        border: 1px solid #d32f2f;
+      }
+      
+      .remove-btn:hover {
+        box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+      }
+      
+      /* Additional shift card hover actions styling - combined with main definition above */
+      
+      .pattern-builder {
+        background: linear-gradient(135deg, #f8f9ff 0%, #f1f3ff 100%);
+        border-radius: 12px;
+        padding: 20px;
+        border: 2px solid #e8ecff;
+        margin-top: 10px;
+      }
+      
+      .quick-add-section {
+        margin-bottom: 24px;
+      }
+      
+      .quick-shifts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 12px;
+        margin-top: 12px;
+      }
+      
+      .quick-shift-btn {
+        padding: 14px 16px;
+        background: linear-gradient(135deg, #4285f4 0%, #3367d6 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        text-align: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        min-height: 64px;
+      }
+      
+      .shift-btn-main {
+        font-size: 15px;
+        font-weight: 700;
+        line-height: 1;
+      }
+      
+      .shift-btn-duration {
+        font-size: 11px;
+        font-weight: 500;
+        opacity: 0.9;
+        background: rgba(255, 255, 255, 0.15);
+        padding: 2px 8px;
+        border-radius: 12px;
+        line-height: 1.2;
+        min-width: 60px;
+      }
+      
+      .shift-btn-duration.zero-hours {
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.7);
+      }
+      
+      .quick-shift-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(66, 133, 244, 0.4);
+        background: linear-gradient(135deg, #3367d6 0%, #2a56c6 100%);
+      }
+      
+      .quick-shift-btn:active {
+        transform: translateY(0);
+      }
+      
+      .quick-shift-btn.custom-btn {
+        background: linear-gradient(135deg, #34a853 0%, #2d8f45 100%);
+        box-shadow: 0 2px 8px rgba(52, 168, 83, 0.3);
+      }
+      
+      .quick-shift-btn.custom-btn:hover {
+        background: linear-gradient(135deg, #2d8f45 0%, #267a3a 100%);
+        box-shadow: 0 4px 16px rgba(52, 168, 83, 0.4);
+      }
+      
+      .pattern-display {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        border: 2px solid #e8ecff;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+        overflow: visible;
+      }
+      
+      .pattern-sequence {
+        min-height: 120px;
+        background: #fafbff;
+        border: 2px dashed #d1d9ff;
+        border-radius: 12px;
+        padding: 30px;
+        margin: 16px 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: flex-start;
+        align-content: flex-start;
+        transition: all 0.3s ease;
+        overflow: visible;
+      }
+      
+      .pattern-sequence:not(:empty) {
+        border-style: solid;
+        border-color: #b8c5ff;
+        background: white;
+      }
+      
+      .empty-pattern {
+        color: #8890a0;
+        font-style: italic;
+        text-align: center;
+        width: 100%;
+        padding: 20px;
+        font-size: 15px;
+      }
+      
+      .pattern-item {
+        display: inline-flex;
+        align-items: center;
+        background: #4285f4;
+        color: white;
+        padding: 10px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        gap: 8px;
+        flex-direction: column;
+        text-align: center;
+        min-width: 80px;
+      }
+      
+      .pattern-item-main {
+        font-weight: 700;
+        font-size: 14px;
+        line-height: 1;
+      }
+      
+      .pattern-item-duration {
+        font-size: 10px;
+        font-weight: 500;
+        opacity: 0.85;
+        background: rgba(255, 255, 255, 0.15);
+        padding: 1px 6px;
+        border-radius: 8px;
+        line-height: 1.2;
+      }
+      
+      .pattern-item-duration.zero-hours {
+        background: rgba(255, 255, 255, 0.1);
+        opacity: 0.7;
+      }
+      
+      .pattern-item:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+      
+      .pattern-item .remove-btn {
+        margin-left: 8px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        font-size: 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+      }
+      
+      .pattern-item .remove-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+      }
+      
+      .pattern-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        margin-top: 16px;
+      }
+      
+      .pattern-action-btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .clear-btn {
+        background: linear-gradient(135deg, #ea4335 0%, #d33b2c 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(234, 67, 53, 0.3);
+      }
+      
+      .clear-btn:hover {
+        background: linear-gradient(135deg, #d33b2c 0%, #c1251e 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(234, 67, 53, 0.4);
+      }
+      
+      .undo-btn {
+        background: linear-gradient(135deg, #f9ab00 0%, #e8a317 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(249, 171, 0, 0.3);
+      }
+      
+      .undo-btn:hover {
+        background: linear-gradient(135deg, #e8a317 0%, #d7940f 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(249, 171, 0, 0.4);
+      }
+      
+      .undo-btn:disabled {
+        background: #e0e0e0;
+        color: #9e9e9e;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+      
+      .section-label {
+        font-weight: bold;
+        margin-top: 15px;
+        margin-bottom: 8px;
+        font-size: 14px;
+        color: #555;
+      }
+      
+      .toggle-container {
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+        margin-bottom: 15px;
+      }
+      
+      .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+        margin-right: 10px;
+      }
+      
+      .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      
+      .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 34px;
+      }
+      
+      .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+      }
+      
+      input:checked + .toggle-slider {
+        background-color: #4285f4;
+      }
+      
+      input:checked + .toggle-slider:before {
+        transform: translateX(26px);
+      }
+      
+      .rolling-options {
+        margin-top: 10px;
+        padding: 10px;
+        background-color: #f9f9f9;
+        border-radius: 4px;
+        border: 1px solid #eee;
+        display: none;
+      }
+      
+      .count-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        line-height: 36px;
+        text-align: center;
+        margin: 4px;
+        border-radius: 50%;
+        background-color: #f1f1f1;
+        color: #333;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 14px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        transition: all 0.2s ease;
+      }
+      
+      .count-button:hover {
+        background-color: #e0e0e0;
+        transform: scale(1.1);
+      }
+      
+      .count-dialog {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border-radius: 8px;
+        z-index: 1000;
+        min-width: 250px;
+      }
+      
+      .count-dialog-title {
+        font-weight: bold;
+        margin-bottom: 15px;
+        font-size: 15px;
+        color: #333;
+        text-align: center;
+      }
+      
+      .count-dialog-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 15px;
+      }
+      
+      .count-dialog-footer {
+        text-align: right;
+        margin-top: 15px;
+      }
+      
+      .count-dialog-cancel {
+        padding: 8px 15px;
+        background: #f1f1f1;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        transition: all 0.2s ease;
+      }
+      
+      .count-dialog-cancel:hover {
+        background: #e0e0e0;
+      }
+      
+      .new-starter-toggle {
+        margin-top: 12px;
+        margin-bottom: 8px;
+      }
+      
+      .new-starter-options {
+        background-color: #f9f9f9;
+        border-radius: 6px;
+        border: 1px solid #eee;
+        padding: 12px;
+        margin-top: 8px;
+        display: none;
+      }
+      
+      .month-year-selector {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      
+      .checkbox-label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        user-select: none;
+      }
+      
+      .checkbox-label input {
+        margin-right: 8px;
+        width: auto;
+      }
+      
+      
+      /* Date Range Builder Styles */
+      .date-range-builder {
+        background: linear-gradient(135deg, #f8f9ff 0%, #f1f3ff 100%);
+        border-radius: 12px;
+        padding: 20px;
+        border: 2px solid #e8ecff;
+        margin-top: 10px;
+      }
+      
+      .date-range-section {
+        margin-bottom: 20px;
+      }
+      
+      .date-selector-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: 16px;
+        margin-top: 12px;
+      }
+      
+      .date-input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      
+      .date-input-group label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #4a5568;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0;
+      }
+      
+      .date-input-group select {
+        padding: 10px 12px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        background: white;
+        font-size: 14px;
+        font-weight: 500;
+        color: #2d3748;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      
+      .date-input-group select:focus {
+        border-color: #4285f4;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+      }
+      
+      .date-input-group select:hover {
+        border-color: #cbd5e0;
+      }
+      
+      .date-range-display {
+        background: white;
+        border-radius: 12px;
+        padding: 16px;
+        border: 2px solid #e8ecff;
+        text-align: center;
+      }
+      
+      .date-range-preview {
+        font-size: 16px;
+        font-weight: 600;
+        color: #2d3748;
+        padding: 12px 16px;
+        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+        border-radius: 8px;
+        margin: 12px 0;
+        border: 2px solid #e2e8f0;
+        min-height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .date-range-preview.has-range {
+        background: linear-gradient(135deg, #e6fffa 0%, #d1fdf7 100%);
+        border-color: #4fd1c7;
+        color: #065f46;
+      }
+      
+      .quick-range-buttons {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* Adjusted from 3 to 2 columns */
+        gap: 8px;
+        margin-top: 16px;
+      }
+      
+      .quick-range-btn {
+        padding: 8px 12px;
+        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+        color: #4a5568;
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        text-align: center;
+      }
+      
+      .quick-range-btn:hover {
+        background: linear-gradient(135deg, #4285f4 0%, #3367d6 100%);
+        color: white;
+        border-color: #4285f4;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);
+      }
+      
+      .quick-range-btn:active {
+        transform: translateY(0);
+      }
+      
+      .main-section-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 16px;
+        display: block;
+      }
+      
+      /* Quick Shifts Section */
+      .quick-shifts-section {
+        margin-bottom: 24px;
+      }
+      
+      .shift-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 16px;
+        margin-top: 16px;
+        width: 100%;
+        overflow-x: auto; /* Allow horizontal scrolling within the grid if content overflows */
+      }
+      
+      .shift-card {
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        position: relative;
+        overflow: visible;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+      
+      .shift-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        border-color: #4285f4;
+      }
+      
+      .shift-card:hover::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 14px;
+        z-index: 5;
+      }
+      
+      .shift-card:active {
+        transform: translateY(0);
+      }
+      
+      .shift-color-badge {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        margin: 0 auto 12px;
+        border: 3px solid white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+      
+      .shift-card-name {
+        font-weight: 700;
+        font-size: 14px;
+        color: #2d3748;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      
+      .shift-card-duration {
+        font-size: 12px;
+        color: #718096;
+        font-weight: 500;
+      }
+      
+      .shift-card-duration.zero-hours {
+        color: #a0aec0;
+        font-style: italic;
+      }
+      
+      .shift-card.custom {
+        border-color: #34d399;
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      }
+      
+      .shift-card.custom .shift-card-name {
+        color: #065f46;
+      }
+      
+      .shift-card.custom::after {
+        content: '✨';
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        font-size: 12px;
+      }
+      
+      /* Custom Shift Creator */
+      .custom-shift-section {
+        text-align: center;
+      }
+      
+      .create-custom-btn {
+        background: linear-gradient(135deg, #4285f4 0%, #3367d6 100%);
+        color: white;
+        border: none;
+        border-radius: 16px;
+        padding: 16px 24px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 16px rgba(66, 133, 244, 0.3);
+        margin-bottom: 24px;
+      }
+      
+      .create-custom-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(66, 133, 244, 0.4);
+        background: linear-gradient(135deg, #3367d6 0%, #2a56c6 100%);
+      }
+      
+      .create-custom-btn:active {
+        transform: translateY(0);
+      }
+      
+      .plus-icon {
+        font-size: 20px;
+        font-weight: bold;
+      }
+      
+      /* Selected Shift Display */
+      .selected-shift-display {
+        margin-top: 0;
+        animation: slideDown 0.3s ease;
+      }
+      
+      @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      .shift-preview-card {
+        background: white;
+        border: 2px solid #e8ecff;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      }
+      
+      .shift-pill {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 20px;
+        background: linear-gradient(135deg, #f8f9ff 0%, #f1f3ff 100%);
+        border-radius: 16px;
+        border: 2px solid #e8ecff;
+        margin-bottom: 20px;
+      }
+      
+      .shift-color-dot {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid rgba(0, 0, 0, 0.1);
+        flex-shrink: 0;
+      }
+      
+      .shift-name {
+        font-weight: 700;
+        font-size: 18px;
+        color: #2d3748;
+        flex: 1;
+      }
+      
+      .shift-duration {
+        font-size: 15px;
+        font-weight: 600;
+        color: #4a5568;
+        background: rgba(66, 133, 244, 0.1);
+        padding: 6px 12px;
+        border-radius: 20px;
+      }
+      
+      .shift-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 12px;
+      }
+      
+      .action-btn {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        text-align: center;
+      }
+      
+      .add-btn {
+        background: linear-gradient(135deg, #4285f4 0%, #3367d6 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);
+      }
+      
+      .add-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 12px rgba(66, 133, 244, 0.4);
+      }
+      
+      .customize-btn {
+        background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+      }
+      
+      .customize-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 12px rgba(255, 152, 0, 0.4);
+      }
+      
+      .remove-btn {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+      }
+      
+      .remove-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 12px rgba(239, 68, 68, 0.4);
+      }
+      
+      /* Shift Editor Styles */
+      .shift-editor {
+        background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+        border: 2px solid #fed7aa;
+        border-radius: 12px;
+        margin-top: 16px;
+        animation: slideDown 0.3s ease;
+        overflow: hidden;
+      }
+      
+      .editor-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+        color: white;
+      }
+      
+      .editor-title {
+        font-weight: 600;
+        font-size: 16px;
+      }
+      
+      .close-editor {
+        width: 28px;
+        height: 28px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .close-editor:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+      }
+      
+      .editor-content {
+        padding: 20px;
+      }
+      
+      .editor-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 100px;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+      
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      
+      .input-group label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #374151;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0;
+      }
+      
+      .editor-input {
+        padding: 10px 12px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        transition: all 0.2s ease;
+        background: white;
+      }
+      
+      .editor-input:focus {
+        border-color: #ea580c;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.1);
+      }
+      
+      .color-picker-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      
+      .quick-colors {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      
+      .quick-color {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: all 0.2s ease;
+      }
+      
+      .quick-color:hover {
+        transform: scale(1.2);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+      
+      .quick-color.selected {
+        border-color: #374151;
+        transform: scale(1.2);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      }
+      
+      .custom-color-picker {
+        width: 100%;
+        height: 32px;
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+        cursor: pointer;
+        background: none;
+      }
+      
+      .duration-input {
+        padding: 10px 8px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        text-align: center;
+        transition: all 0.2s ease;
+        background: white;
+      }
+      
+      .duration-input:focus {
+        border-color: #ea580c;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.1);
+      }
+      
+      .editor-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      
+      .editor-action-btn {
+        padding: 10px 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        flex: 1;
+        min-width: 80px;
+      }
+      
+      .save-btn {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+      }
+      
+      .save-btn:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 12px rgba(34, 197, 94, 0.4);
+      }
+      
+      .save-add-btn {
+        background: linear-gradient(135deg, #4285f4 0%, #3367d6 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);
+      }
+      
+      .save-add-btn:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 12px rgba(66, 133, 244, 0.4);
+      }
+      
+      .cancel-btn {
+        background: #f5f5f5;
+        color: #666;
+        border: 2px solid #e0e0e0;
+      }
+      
+      .cancel-btn:hover {
+        background: #e0e0e0;
+        border-color: #bdbdbd;
+      }
+      
+      .save-btn:disabled, .save-add-btn:disabled {
+        background: #e0e0e0;
+        color: #9e9e9e;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+      
+      @media (max-width: 640px) {
+        .editor-row {
+          grid-template-columns: 1fr;
+        }
+        
+        .shift-actions, .editor-actions {
+          flex-direction: column;
+        }
+      }
+
+      /* Pattern total display styles */
+      .pattern-total {
+        background: linear-gradient(135deg, #e8f5e8 0%, #d4f2d4 100%);
+        border: 2px solid #4caf50;
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin: 16px 0;
+        text-align: center;
+        font-size: 16px;
+        font-weight: 600;
+        color: #2e7d32;
+        box-shadow: 0 3px 12px rgba(76, 175, 80, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+      }
+      
+      .pattern-length {
+        font-size: 14px;
+        font-weight: 500;
+        opacity: 0.8;
+        background: rgba(46, 125, 50, 0.1);
+        padding: 4px 10px;
+        border-radius: 16px;
+        border: 1px solid rgba(46, 125, 50, 0.2);
+      }
+      
+      @media (max-width: 640px) {
+        .main-layout {
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+        
+        .shift-actions {
+          grid-template-columns: 1fr;
+        }
+        
+        .editor-actions {
+          flex-direction: column;
+        }
+      }
+      
+      @media (max-width: 480px) {
+        .date-selector-grid {
+          grid-template-columns: 1fr;
+        }
+        
+        .quick-range-buttons {
+          grid-template-columns: 1fr;
+        }
+        
+        .pattern-total {
+          flex-direction: column;
+          gap: 8px;
+        }
+      }
+
+      /* Month Creation Section Styles */
+      .month-creation-section {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+      }
+
+      .month-creation-section h4 {
+        margin: 0 0 15px 0;
+        color: #495057;
+        font-size: 16px;
+      }
+
+      .month-checkboxes {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin-bottom: 15px;
+      }
+
+      .checkbox-row {
+        display: contents;
+      }
+
+      .month-checkboxes label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        padding: 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+
+      .month-checkboxes label:hover {
+        background-color: #e9ecef;
+      }
+
+      .month-checkboxes input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+      }
+
+      .year-selection {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      .year-selection label {
+        font-weight: 500;
+        color: #495057;
+      }
+
+      .quick-select-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .quick-select-btn {
+        padding: 6px 12px;
+        background: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 500;
+        transition: background-color 0.2s ease;
+      }
+
+      .quick-select-btn:hover {
+        background: #5a6268;
+      }
+
+      .quick-select-btn:active {
+        transform: scale(0.98);
+      }
+
+      @media (max-width: 768px) {
+        .month-checkboxes {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .quick-select-buttons {
+          justify-content: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h3>Generate Monthly Rota</h3>
+      
+      <div class="main-layout">
+        <div class="left-column">
+          <div class="section">
+            <label for="staffSelect">Staff Member:</label>
+            <select id="staffSelect">
+              <option value="">Loading staff...</option>
+            </select>
+          </div>
+          
+          <div class="section">
+            <label class="main-section-title">🎯 Build Your Shift Pattern</label>
+            
+            <div class="pattern-builder">
+              <!-- Quick Shift Cards -->
+              <div class="quick-shifts-section">
+                <div class="section-label">Quick Add Shifts:</div>
+                <div class="shift-cards-grid" id="shiftCardsGrid">
+                  <!-- Shift cards will be populated here -->
+                </div>
+              </div>
+              
+              <!-- Custom Shift Creator -->
+              <div class="custom-shift-section">
+                <button type="button" id="createCustomShift" class="create-custom-btn">
+                  <span class="plus-icon">+</span>
+                  <span>Create Custom Shift</span>
+                </button>
+                <div id="customShiftMessage" class="section-message"></div>
+              </div>
+          
+          <div class="shift-editor" id="shiftEditor" style="display: none;">
+            <div class="editor-header">
+              <span class="editor-title" id="editorTitle">✨ Create New Shift</span>
+              <button type="button" id="closeEditor" class="close-editor">×</button>
+            </div>
+            <div class="editor-content">
+              <div class="editor-row">
+                <div class="input-group">
+                  <label>Name:</label>
+                  <input type="text" id="editShiftName" placeholder="Shift name (e.g. EVENING)" maxlength="12" class="editor-input">
+                </div>
+                <div class="input-group">
+                  <label>Color:</label>
+                  <div class="color-picker-group">
+                    <div class="quick-colors">
+                      <div class="quick-color" data-color="#FF5722" style="background: #FF5722;"></div>
+                      <div class="quick-color" data-color="#E91E63" style="background: #E91E63;"></div>
+                      <div class="quick-color" data-color="#9C27B0" style="background: #9C27B0;"></div>
+                      <div class="quick-color" data-color="#2196F3" style="background: #2196F3;"></div>
+                      <div class="quick-color" data-color="#4CAF50" style="background: #4CAF50;"></div>
+                      <div class="quick-color" data-color="#FF9800" style="background: #FF9800;"></div>
+                    </div>
+                    <input type="color" id="customColorPicker" class="custom-color-picker" value="#9C27B0">
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label>Hours:</label>
+                  <input type="number" id="editShiftHours" min="0" max="24" step="0.5" value="8" class="duration-input">
+                </div>
+              </div>
+              <div class="editor-actions">
+                <button type="button" id="saveShift" class="editor-action-btn save-btn" disabled>Save</button>
+                <button type="button" id="saveAndAdd" class="editor-action-btn save-add-btn" disabled>Save & Add to Pattern</button>
+                <button type="button" id="cancelEdit" class="editor-action-btn cancel-btn">Cancel</button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="pattern-display">
+            <div class="section-label">Your Pattern:</div>
+            <div class="pattern-sequence" id="patternSequence">
+              <div class="empty-pattern">Click buttons above to build your pattern</div>
+            </div>
+            <div class="pattern-actions">
+              <button type="button" id="clearPatternBtn" class="pattern-action-btn clear-btn">Clear All</button>
+              <button type="button" id="undoLastBtn" class="pattern-action-btn undo-btn">Undo Last</button>
+            </div>
+            <div id="patternMessage" class="section-message"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="right-column">
+        <div class="section">
+          <label>📅 Select Month to Generate:</label>
+          
+          <div class="month-selection-container">
+            <div class="month-selection-grid">
+              <div class="month-input-group">
+                <label for="monthSelect">Month & Year</label>
+                <div class="month-year-selector">
+                  <select id="monthSelect" class="month-dropdown">
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                  </select>
+                  <select id="yearSelect" class="year-dropdown"></select>
+                </div>
+              </div>
+              
+              <div class="date-range-input-group">
+                <label for="startDayInput">Day Range (optional)</label>
+                <div class="day-range-selector">
+                  <input type="number" id="startDayInput" min="1" max="31" value="1" class="day-input">
+                  <span class="day-separator">to</span>
+                  <input type="number" id="endDayInput" min="1" max="31" value="31" class="day-input">
+                </div>
+                <small class="day-range-help">Leave as 1-31 to apply to entire month</small>
+              </div>
+            </div>
+            
+            <div class="month-preview-card">
+              <div class="preview-header">📊 Selected Month:</div>
+              <div id="monthPreview" class="month-preview-content">
+                September 2025 (Days 1-30)
+              </div>
+              <div class="quick-month-buttons">
+                <button type="button" class="quick-month-btn" id="currentMonthBtn">Current Month</button>
+                <button type="button" class="quick-month-btn" id="nextMonthBtn">Next Month</button>
+              </div>
+            </div>
+            
+            <div class="multi-month-notice">
+              <div class="notice-icon">💡</div>
+              <div class="notice-content">
+                <strong>Multi-Month Rotas:</strong> Process one month at a time for best results. 
+                Use "Create Monthly Sheets" first, then generate each month individually.
+              </div>
+            </div>
+          </div>
+          
+          <!-- Month Selection for Sheet Creation -->
+          <div class="month-creation-section">
+            <h4>📅 Create Monthly Sheets</h4>
+            <div class="month-selection-container">
+              <p>Select which months to create:</p>
+              <div class="month-checkboxes">
+                <div class="checkbox-row">
+                  <label><input type="checkbox" id="month-1" value="1"> January</label>
+                  <label><input type="checkbox" id="month-2" value="2"> February</label>
+                  <label><input type="checkbox" id="month-3" value="3"> March</label>
+                  <label><input type="checkbox" id="month-4" value="4"> April</label>
+                </div>
+                <div class="checkbox-row">
+                  <label><input type="checkbox" id="month-5" value="5"> May</label>
+                  <label><input type="checkbox" id="month-6" value="6"> June</label>
+                  <label><input type="checkbox" id="month-7" value="7"> July</label>
+                  <label><input type="checkbox" id="month-8" value="8"> August</label>
+                </div>
+                <div class="checkbox-row">
+                  <label><input type="checkbox" id="month-9" value="9"> September</label>
+                  <label><input type="checkbox" id="month-10" value="10"> October</label>
+                  <label><input type="checkbox" id="month-11" value="11"> November</label>
+                  <label><input type="checkbox" id="month-12" value="12"> December</label>
+                </div>
+              </div>
+              <div class="year-selection">
+                <label for="sheetCreationYear">Year:</label>
+                <select id="sheetCreationYear" class="year-dropdown"></select>
+              </div>
+              <div class="quick-select-buttons">
+                <button type="button" class="quick-select-btn" id="selectCurrentQuarter">Current Quarter</button>
+                <button type="button" class="quick-select-btn" id="selectNextQuarter">Next Quarter</button>
+                <button type="button" class="quick-select-btn" id="selectAll">Select All</button>
+                <button type="button" class="quick-select-btn" id="clearAll">Clear All</button>
+              </div>
+            </div>
+          </div>
+          
+          <div id="statusMessage" style="display: none;" class="status-message"></div>
+          
+          <div class="button-container">
+            <button id="testButton" class="action-btn test-btn">🧪 Test Connection</button>
+            <button id="createSheetsButton" class="action-btn create-btn">📅 Create Selected Sheets</button>
+            <button id="applyButton" class="action-btn primary-btn">🎯 Generate Monthly Rota</button>
+          </div>
+        </div>
+      </div>
+    </div>
+      
+      
+    </div>
+    
+    <script>
+      // Global variables
+      let shiftPatterns = {};
+      let currentYear = new Date().getFullYear();
+      let currentMonth = new Date().getMonth() + 1; // 1-based month
+      
+      // Track if page is initialized to prevent duplicate listeners
+      let isInitialized = false;
+      
+      // Initialize the page
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM Content Loaded - Starting initialization');
+        
+        if (isInitialized) return;
+        isInitialized = true;
+        
+        // FIRST: Initialize date range functionality IMMEDIATELY
+        console.log('Step 1: Initializing date range...');
+        setTimeout(function() {
+          initializeDateRange();
+          initializeMonthSelection();
+        }, 100);
+        
+        // Load staff names from both Settings and sheet
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              populateStaffSelect(result.staff);
+              if (result.settingsCount > 0) {
+                showMessage(`Loaded ${result.settingsCount} staff from Settings and ${result.sheetCount} from current sheet.`, 'success');
+              }
+            } else {
+              showError('Failed to load staff: ' + result.message);
+            }
+          })
+          .withFailureHandler(showError)
+          .getAllAvailableStaff();
+        
+        // Load shift patterns
+        google.script.run
+          .withSuccessHandler(function(patterns) {
+            shiftPatterns = patterns;
+            createShiftButtons(patterns);
+            updateUndoButton();
+            loadExistingCustomShifts(patterns);
+          })
+          .withFailureHandler(showError)
+          .getShiftPatterns();
+        
+        // Set up event listeners only once
+        const applyButton = document.getElementById('applyButton');
+        const clearPatternBtn = document.getElementById('clearPatternBtn');
+        const testButton = document.getElementById('testButton');
+        
+        if (applyButton && !applyButton.hasAttribute('data-listener-added')) {
+          applyButton.addEventListener('click', applyPattern);
+          applyButton.setAttribute('data-listener-added', 'true');
+        }
+        
+        if (clearPatternBtn && !clearPatternBtn.hasAttribute('data-listener-added')) {
+          clearPatternBtn.addEventListener('click', clearPattern);
+          clearPatternBtn.setAttribute('data-listener-added', 'true');
+        }
+        
+        if (testButton && !testButton.hasAttribute('data-listener-added')) {
+          testButton.addEventListener('click', testConnection);
+          testButton.setAttribute('data-listener-added', 'true');
+        }
+        
+        const createSheetsButton = document.getElementById('createSheetsButton');
+        if (createSheetsButton && !createSheetsButton.hasAttribute('data-listener-added')) {
+          createSheetsButton.addEventListener('click', createMonthlySheets);
+          createSheetsButton.setAttribute('data-listener-added', 'true');
+        }
+        
+        const undoLastBtn = document.getElementById('undoLastBtn');
+        if (undoLastBtn && !undoLastBtn.hasAttribute('data-listener-added')) {
+          undoLastBtn.addEventListener('click', undoLastShift);
+          undoLastBtn.setAttribute('data-listener-added', 'true');
+        }
+        
+        // Set up quick shift buttons
+        setupQuickShiftButtons();
+        
+        // Set up shift editor event listeners
+        setupShiftEditor();
+      });
+      
+      // Populate staff dropdown
+      function populateStaffSelect(staffNames) {
+        const select = document.getElementById('staffSelect');
+        select.innerHTML = '';
+        
+        if (staffNames.length === 0) {
+          const option = document.createElement('option');
+          option.value = '';
+          option.textContent = 'No staff members found';
+          select.appendChild(option);
+          showMessage('No staff members found in the sheet. Please add staff names in column A of your rota sheet.', 'error');
+          return;
+        }
+        
+        // Add default empty option
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = '-- Select Staff Member --';
+        select.appendChild(defaultOption);
+        
+        // Add staff names
+        staffNames.forEach(function(staff) {
+          const option = document.createElement('option');
+          // Check if the staff data is an object with name property or just a string
+          if (typeof staff === 'object' && staff.name) {
+            option.value = staff.name;
+            option.textContent = staff.name;
+          } else {
+            option.value = staff;
+            option.textContent = staff;
+          }
+          select.appendChild(option);
+        });
+      }
+      
+      // Global pattern storage
+      let currentPattern = [];
+      
+      
+      // Main function to set up shift management with cards
+      function createShiftButtons(patterns) {
+        populateShiftCards(patterns);
+        setupCustomShiftButton();
+      }
+      
+      // Populate shift cards instead of dropdown
+      function populateShiftCards(patterns) {
+        const container = document.getElementById('shiftCardsGrid');
+        container.innerHTML = '';
+        
+        // Sort shifts - put defaults first, then custom ones
+        const sortedShifts = Object.keys(patterns).sort((a, b) => {
+          const aIsCustom = patterns[a].custom || false;
+          const bIsCustom = patterns[b].custom || false;
+          
+          if (aIsCustom && !bIsCustom) return 1;
+          if (!aIsCustom && bIsCustom) return -1;
+          return a.localeCompare(b);
+        });
+        
+        sortedShifts.forEach(shiftType => {
+          const shift = patterns[shiftType];
+          const card = createShiftCard(shiftType, shift);
+          container.appendChild(card);
+        });
+      }
+      
+      // Create individual shift card
+      function createShiftCard(shiftType, shiftInfo) {
+        const card = document.createElement('div');
+        card.className = `shift-card ${shiftInfo.custom ? 'custom' : ''}`;
+        card.setAttribute('data-shift', shiftType);
+        
+        const durationText = formatDuration(shiftInfo.hours);
+        const durationClass = shiftInfo.hours === 0 ? 'zero-hours' : '';
+        
+        card.innerHTML = `
+          <div class="shift-color-badge" style="background-color: ${shiftInfo.color};"></div>
+          <div class="shift-card-name">${shiftInfo.label}</div>
+          <div class="shift-card-duration ${durationClass}">${durationText}</div>
+          <div class="shift-card-actions">
+            <button class="card-action-btn customize-btn">Customize</button>
+            <button class="card-action-btn remove-btn">Remove</button>
+          </div>
+        `;
+        
+        // Add click handler to add to pattern
+        card.addEventListener('click', function() {
+          addShiftToPattern(shiftType);
+          
+          // Visual feedback
+          card.style.transform = 'scale(0.95)';
+          setTimeout(() => {
+            card.style.transform = '';
+          }, 150);
+        });
+        
+        // Add event listeners for action buttons
+        const customizeBtn = card.querySelector('.customize-btn');
+        const removeBtn = card.querySelector('.remove-btn');
+        
+        if (customizeBtn) {
+          customizeBtn.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent card click
+            openShiftEditor('edit', shiftType);
+          });
+        }
+        
+        if (removeBtn) {
+          removeBtn.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent card click
+            if (confirm(`Remove "${shiftInfo.label}" shift?`)) {
+              showSectionMessage('customShiftMessage', 'Removing shift...', 'loading');
+              removeCustomShift(shiftType);
+            }
+          });
+        }
+        
+        // Keep right-click for backward compatibility
+        card.addEventListener('contextmenu', function(e) {
+          e.preventDefault();
+          showShiftContextMenu(e, shiftType, shiftInfo);
+        });
+        
+        return card;
+      }
+      
+      // Setup custom shift creation button
+      function setupCustomShiftButton() {
+        console.log('Setting up custom shift button...');
+        const btn = document.getElementById('createCustomShift');
+        console.log('Button found:', !!btn);
+        
+        if (btn && !btn.hasAttribute('data-listener-added')) {
+          console.log('Adding click listener to custom shift button');
+          btn.addEventListener('click', function() {
+            console.log('Create custom shift button clicked!');
+            openShiftEditor('create');
+          });
+          btn.setAttribute('data-listener-added', 'true');
+          console.log('Custom shift button setup complete');
+        } else if (btn) {
+          console.log('Button already has listener');
+        } else {
+          console.error('Create custom shift button not found!');
+        }
+      }
+      
+      // Show context menu for shift cards
+      function showShiftContextMenu(event, shiftType, shiftInfo) {
+        // Remove any existing context menu
+        const existingMenu = document.querySelector('.shift-context-menu');
+        if (existingMenu) {
+          existingMenu.remove();
+        }
+        
+        const menu = document.createElement('div');
+        menu.className = 'shift-context-menu';
+        menu.style.position = 'fixed';
+        menu.style.left = event.clientX + 'px';
+        menu.style.top = event.clientY + 'px';
+        menu.style.zIndex = '1000';
+        menu.style.background = 'white';
+        menu.style.border = '2px solid #e2e8f0';
+        menu.style.borderRadius = '8px';
+        menu.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.15)';
+        menu.style.padding = '8px';
+        menu.style.minWidth = '120px';
+        
+        const editBtn = document.createElement('button');
+        editBtn.textContent = 'Customize';
+        editBtn.style.cssText = 'width: 100%; padding: 12px 16px; border: none; background: linear-gradient(135deg, #4285f4 0%, #3367d6 100%); color: white; border-radius: 6px; cursor: pointer; margin-bottom: 6px; font-weight: 600; font-size: 14px; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);';
+        editBtn.addEventListener('mouseover', function() {
+          this.style.background = 'linear-gradient(135deg, #3367d6 0%, #2a56c6 100%)';
+          this.style.transform = 'translateY(-1px)';
+          this.style.boxShadow = '0 4px 12px rgba(66, 133, 244, 0.4)';
+        });
+        editBtn.addEventListener('mouseout', function() {
+          this.style.background = 'linear-gradient(135deg, #4285f4 0%, #3367d6 100%)';
+          this.style.transform = 'translateY(0)';
+          this.style.boxShadow = '0 2px 8px rgba(66, 133, 244, 0.3)';
+        });
+        editBtn.addEventListener('click', function() {
+          openShiftEditor('edit', shiftType);
+          menu.remove();
+        });
+        
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = 'Remove';
+        removeBtn.style.cssText = 'width: 100%; padding: 12px 16px; border: none; background: linear-gradient(135deg, #ea4335 0%, #d33b2c 100%); color: white; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(234, 67, 53, 0.3);';
+        removeBtn.addEventListener('mouseover', function() {
+          this.style.background = 'linear-gradient(135deg, #d33b2c 0%, #c1251e 100%)';
+          this.style.transform = 'translateY(-1px)';
+          this.style.boxShadow = '0 4px 12px rgba(234, 67, 53, 0.4)';
+        });
+        removeBtn.addEventListener('mouseout', function() {
+          this.style.background = 'linear-gradient(135deg, #ea4335 0%, #d33b2c 100%)';
+          this.style.transform = 'translateY(0)';
+          this.style.boxShadow = '0 2px 8px rgba(234, 67, 53, 0.3)';
+        });
+        removeBtn.addEventListener('click', function() {
+          if (confirm(`Remove "${shiftInfo.label}" shift?`)) {
+            removeCustomShift(shiftType);
+          }
+          menu.remove();
+        });
+        
+        menu.appendChild(editBtn);
+        menu.appendChild(removeBtn);
+        document.body.appendChild(menu);
+        
+        // Remove menu when clicking elsewhere
+        setTimeout(() => {
+          document.addEventListener('click', function removeMenu() {
+            menu.remove();
+            document.removeEventListener('click', removeMenu);
+          });
+        }, 10);
+      }
+      
+      function createShiftButton(shiftType, shiftInfo, container) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'quick-shift-btn';
+        button.setAttribute('data-shift', shiftType);
+        
+        // Format duration display
+        const durationText = formatDuration(shiftInfo.hours);
+        const durationClass = shiftInfo.hours === 0 ? 'zero-hours' : '';
+        
+        button.innerHTML = `
+          <div class="shift-btn-main">+ ${shiftInfo.label || shiftType}</div>
+          <div class="shift-btn-duration ${durationClass}">${durationText}</div>
+        `;
+        
+        // Add click handler
+        button.addEventListener('click', function() {
+          addShiftToPattern(shiftType);
+        });
+        
+        container.appendChild(button);
+        return button;
+      }
+      
+      function formatDuration(hours) {
+        if (hours === 0) {
+          return 'No hours';
+        }
+        
+        const wholeHours = Math.floor(hours);
+        const minutes = Math.round((hours - wholeHours) * 60);
+        
+        if (minutes === 0) {
+          return `${wholeHours}h`;
+        } else if (wholeHours === 0) {
+          return `${minutes}m`;
+        } else {
+          return `${wholeHours}h ${minutes}m`;
+        }
+      }
+      
+      // Set up shift management functionality
+      function setupQuickShiftButtons() {
+        // Shift editor setup is handled separately
+      }
+      
+      let currentlySelectedShift = null;
+      let currentlyEditingShift = null;
+      let selectedEditorColor = '#9C27B0';
+      
+      function setupShiftManager() {
+        const dropdown = document.getElementById('shiftDropdown');
+        const selectedDisplay = document.getElementById('selectedShiftDisplay');
+        const shiftEditor = document.getElementById('shiftEditor');
+        
+        // Handle dropdown selection
+        dropdown.addEventListener('change', function() {
+          const selectedValue = this.value;
+          const colorIndicator = document.getElementById('dropdownColorIndicator');
+          
+          console.log('Dropdown changed to:', selectedValue);
+          
+          if (selectedValue === '__CREATE_NEW__') {
+            // Start creating new shift
+            openShiftEditor('create');
+            dropdown.value = '';
+            colorIndicator.classList.remove('visible');
+          } else if (selectedValue && shiftPatterns[selectedValue]) {
+            // Show color indicator with enhanced visibility
+            const shift = shiftPatterns[selectedValue];
+            console.log('Setting color indicator to:', shift.color);
+            
+            colorIndicator.style.backgroundColor = shift.color;
+            colorIndicator.classList.add('visible');
+            
+            // Show selected shift details
+            showSelectedShift(selectedValue);
+          } else {
+            // Hide display and indicator
+            selectedDisplay.style.display = 'none';
+            colorIndicator.classList.remove('visible');
+            currentlySelectedShift = null;
+          }
+        });
+        
+        // Set up action buttons for selected shift
+        setupSelectedShiftActions();
+      }
+      
+      function showSelectedShift(shiftType) {
+        const shift = shiftPatterns[shiftType];
+        const selectedDisplay = document.getElementById('selectedShiftDisplay');
+        const shiftColorDot = document.getElementById('shiftColorDot');
+        const shiftName = document.getElementById('shiftPreviewName');
+        const shiftDuration = document.getElementById('shiftPreviewDuration');
+        const removeBtn = document.getElementById('removeShift');
+        const customizeBtn = document.getElementById('customizeShift');
+        
+        currentlySelectedShift = shiftType;
+        
+        // Update display with actual color
+        shiftColorDot.style.backgroundColor = shift.color;
+        shiftName.textContent = shift.label;
+        shiftDuration.textContent = formatDuration(shift.hours);
+        
+        // Allow removing ALL shifts - user has full control
+        removeBtn.style.display = 'block';
+        customizeBtn.textContent = shift.custom ? 'Edit' : 'Customize';
+        
+        selectedDisplay.style.display = 'block';
+      }
+      
+      function setupSelectedShiftActions() {
+        document.getElementById('addToPattern').addEventListener('click', function() {
+          if (currentlySelectedShift && shiftPatterns[currentlySelectedShift]) {
+            addShiftToPattern(currentlySelectedShift);
+          }
+        });
+        
+        document.getElementById('customizeShift').addEventListener('click', function() {
+          if (currentlySelectedShift) {
+            openShiftEditor('edit', currentlySelectedShift);
+          }
+        });
+        
+        document.getElementById('removeShift').addEventListener('click', function() {
+          if (currentlySelectedShift && confirm(`Remove "${currentlySelectedShift}" shift permanently?`)) {
+            removeCustomShift(currentlySelectedShift);
+          }
+        });
+      }
+      
+      function setupShiftEditor() {
+        const nameInput = document.getElementById('editShiftName');
+        const hoursInput = document.getElementById('editShiftHours');
+        const colorPicker = document.getElementById('customColorPicker');
+        const colorButtons = document.querySelectorAll('#shiftEditor .quick-color');
+        const saveBtn = document.getElementById('saveShift');
+        const saveAddBtn = document.getElementById('saveAndAdd');
+        const cancelBtn = document.getElementById('cancelEdit');
+        const closeBtn = document.getElementById('closeEditor');
+        
+        // Check if already initialized to prevent duplicate listeners
+        if (saveBtn && saveBtn.hasAttribute('data-listener-added')) {
+          console.log('Shift editor already initialized');
+          return;
+        }
+        
+        // Color selection
+        colorButtons.forEach(btn => {
+          if (!btn.hasAttribute('data-listener-added')) {
+            btn.addEventListener('click', function() {
+              colorButtons.forEach(b => b.classList.remove('selected'));
+              this.classList.add('selected');
+              selectedEditorColor = this.getAttribute('data-color');
+              colorPicker.value = selectedEditorColor;
+              updateEditorButtons();
+            });
+            btn.setAttribute('data-listener-added', 'true');
+          }
+        });
+        
+        if (colorPicker && !colorPicker.hasAttribute('data-listener-added')) {
+          colorPicker.addEventListener('input', function() {
+            selectedEditorColor = this.value;
+            colorButtons.forEach(b => b.classList.remove('selected'));
+            updateEditorButtons();
+          });
+          colorPicker.setAttribute('data-listener-added', 'true');
+        }
+        
+        // Input validation
+        function updateEditorButtons() {
+          const name = nameInput.value.trim();
+          const isValid = name.length >= 2;
+          saveBtn.disabled = !isValid;
+          saveAddBtn.disabled = !isValid;
+        }
+        
+        if (nameInput && !nameInput.hasAttribute('data-listener-added')) {
+          nameInput.addEventListener('input', updateEditorButtons);
+          nameInput.setAttribute('data-listener-added', 'true');
+        }
+        
+        if (hoursInput && !hoursInput.hasAttribute('data-listener-added')) {
+          hoursInput.addEventListener('input', updateEditorButtons);
+          hoursInput.setAttribute('data-listener-added', 'true');
+        }
+        
+        // Action handlers
+        if (saveBtn && !saveBtn.hasAttribute('data-listener-added')) {
+          saveBtn.addEventListener('click', function() {
+            saveShiftChanges(false);
+          });
+          saveBtn.setAttribute('data-listener-added', 'true');
+        }
+        
+        if (saveAddBtn && !saveAddBtn.hasAttribute('data-listener-added')) {
+          saveAddBtn.addEventListener('click', function() {
+            saveShiftChanges(true);
+          });
+          saveAddBtn.setAttribute('data-listener-added', 'true');
+        }
+        
+        if (cancelBtn && !cancelBtn.hasAttribute('data-listener-added')) {
+          cancelBtn.addEventListener('click', closeShiftEditor);
+          cancelBtn.setAttribute('data-listener-added', 'true');
+        }
+        
+        if (closeBtn && !closeBtn.hasAttribute('data-listener-added')) {
+          closeBtn.addEventListener('click', closeShiftEditor);
+          closeBtn.setAttribute('data-listener-added', 'true');
+        }
+      }
+      
+      function openShiftEditor(mode, shiftType = null) {
+        console.log('Opening shift editor in mode:', mode, 'for shift:', shiftType);
+        const editor = document.getElementById('shiftEditor');
+        const title = document.getElementById('editorTitle');
+        console.log('Editor element found:', !!editor);
+        console.log('Title element found:', !!title);
+        const nameInput = document.getElementById('editShiftName');
+        const hoursInput = document.getElementById('editShiftHours');
+        const colorPicker = document.getElementById('customColorPicker');
+        const colorButtons = document.querySelectorAll('#shiftEditor .quick-color');
+        
+        // Check if required elements exist
+        if (!editor || !title || !nameInput || !hoursInput || !colorPicker) {
+          console.error('Missing required shift editor elements:', {
+            editor: !!editor,
+            title: !!title,
+            nameInput: !!nameInput,
+            hoursInput: !!hoursInput,
+            colorPicker: !!colorPicker
+          });
+          return;
+        }
+        
+        currentlyEditingShift = shiftType;
+        
+        if (mode === 'create') {
+          title.textContent = '✨ Create New Shift';
+          nameInput.value = '';
+          hoursInput.value = '8';
+          selectedEditorColor = '#9C27B0';
+        } else if (mode === 'edit' && shiftType) {
+          const shift = shiftPatterns[shiftType];
+          title.textContent = `🔧 Edit ${shift.label}`;
+          nameInput.value = shift.label;
+          hoursInput.value = shift.hours;
+          selectedEditorColor = shift.color;
+        }
+        
+        // Update color picker and selection
+        colorPicker.value = selectedEditorColor;
+        colorButtons.forEach(btn => {
+          btn.classList.toggle('selected', btn.getAttribute('data-color') === selectedEditorColor);
+        });
+        
+        // Hide selected shift display if it exists
+        const selectedShiftDisplay = document.getElementById('selectedShiftDisplay');
+        if (selectedShiftDisplay) {
+          selectedShiftDisplay.style.display = 'none';
+        }
+        
+        editor.style.display = 'block';
+        nameInput.focus();
+      }
+      
+      function saveShiftChanges(addToPattern) {
+        const name = document.getElementById('editShiftName').value.trim().toUpperCase();
+        const hours = parseFloat(document.getElementById('editShiftHours').value) || 0;
+        
+        if (name.length < 2) return;
+        
+        // Create/update shift
+        const newShift = {
+          label: name,
+          hours: hours,
+          color: selectedEditorColor,
+          custom: true // Always mark as custom when saved from the editor
+        };
+        
+        // Determine if the original shift (if any) was predefined or custom
+        const originalShift = shiftPatterns[currentlyEditingShift];
+        const originalIsCustom = originalShift ? originalShift.custom : false;
+
+        // If the name changed or if it's a predefined shift being 'edited' (customized)
+        if (currentlyEditingShift && currentlyEditingShift !== name || (currentlyEditingShift && !originalIsCustom)) {
+          // If it was a custom shift, truly delete the old entry
+          if (originalIsCustom) {
+            delete customShifts[currentlyEditingShift]; // Remove from local custom list
+            google.script.run
+              .withSuccessHandler(function(result) {
+                if (!result.success) {
+                  console.warn('Failed to delete old custom shift:', result.message);
+                }
+              })
+              .withFailureHandler(function(error) {
+                console.warn('Error deleting old custom shift:', error);
+              })
+              .deleteShiftPattern(currentlyEditingShift);
+          } else {
+            // If it was a predefined shift, tell the server to hide it
+            google.script.run
+              .withSuccessHandler(function(result) {
+                if (!result.success) {
+                  console.warn('Failed to hide predefined shift:', result.message);
+                }
+              })
+              .withFailureHandler(function(error) {
+                console.warn('Error hiding predefined shift:', error);
+              })
+              .deleteShiftPattern(currentlyEditingShift);
+          }
+          // Remove from local shiftPatterns for immediate UI update
+          delete shiftPatterns[currentlyEditingShift];
+        }
+
+        // Save the new/updated shift (always as a custom shift now)
+        shiftPatterns[name] = newShift;
+        customShifts[name] = newShift;
+        
+        // Show loading indicator
+        const action = currentlyEditingShift ? 'updating' : 'creating';
+        showSectionMessage('customShiftMessage', `${action.charAt(0).toUpperCase() + action.slice(1)} "${name}" shift...`, 'loading');
+        
+        // Save to server first
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              // Update cards to reflect changes
+              populateShiftCards(shiftPatterns);
+              
+              // Add to pattern if requested
+              if (addToPattern) {
+                addShiftToPattern(name, newShift);
+                showSectionMessage('patternMessage', `✨ "${name}" added to pattern!`, 'success');
+              }
+              
+              // Close editor
+              closeShiftEditor();
+              
+              // Show success message in custom shift section
+              const finalAction = currentlyEditingShift ? 'updated' : 'created';
+              showSectionMessage('customShiftMessage', `✨ "${name}" ${finalAction}! (${formatDuration(hours)})`, 'success');
+            } else {
+              showSectionMessage('customShiftMessage', `Failed to save shift: ${result.message}`, 'error');
+            }
+          })
+          .withFailureHandler(function(error) {
+            console.warn('Error saving custom shift:', error);
+            showSectionMessage('customShiftMessage', 'Failed to save shift. Please try again.', 'error');
+          })
+          .saveCustomShift(name, newShift);
+      }
+      
+      function closeShiftEditor() {
+        document.getElementById('shiftEditor').style.display = 'none';
+        currentlyEditingShift = null;
+      }
+      
+      function removeCustomShift(shiftType) {
+        const shiftInfo = shiftPatterns[shiftType];
+        const isDefault = ['EARLY', 'LATE', 'NIGHT', 'DAY', 'OFF', 'AL', 'SICK', 'TRAINING'].includes(shiftType);
+        
+        // Different confirmation messages for default vs custom shifts
+        let confirmMessage;
+        if (isDefault) {
+          confirmMessage = `Remove "${shiftInfo.label}" shift from your available shifts?\n\nNote: This is a predefined shift. You can always add it back later by creating a new shift with the same name.`;
+        } else {
+          confirmMessage = `Remove "${shiftInfo.label}" shift permanently?\n\nThis will delete it from all saved shifts and cannot be undone.`;
+        }
+        
+        if (!confirm(confirmMessage)) {
+          return;
+        }
+        
+        // Remove from server first
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              // Remove from local patterns
+              delete shiftPatterns[shiftType];
+              if (customShifts[shiftType]) {
+                delete customShifts[shiftType];
+              }
+              
+              // Update cards to reflect changes
+              populateShiftCards(shiftPatterns);
+              
+              currentlySelectedShift = null;
+              
+              // Show success message in custom shift section
+              showSectionMessage('customShiftMessage', `✨ "${shiftInfo.label}" shift removed`, 'success');
+            } else {
+              showSectionMessage('customShiftMessage', `Failed to remove shift: ${result.message}`, 'error');
+            }
+          })
+          .withFailureHandler(function(error) {
+            console.warn('Error removing shift:', error);
+            showSectionMessage('customShiftMessage', 'Failed to remove shift. Please try again.', 'error');
+          })
+          .deleteShiftPattern(shiftType);
+      }
+      
+      // Add shift to pattern
+      function addShiftToPattern(shiftType, customData = null) {
+        const shiftInfo = customData || shiftPatterns[shiftType];
+        if (!shiftInfo) return;
+        
+        // Show brief loading indicator for adding
+        showSectionMessage('patternMessage', `Adding ${shiftInfo.label}...`, 'loading');
+        
+        setTimeout(() => {
+          currentPattern.push({
+            type: shiftType,
+            color: shiftInfo.color,
+            hours: shiftInfo.hours,
+            custom: shiftInfo.custom || false
+          });
+          
+          updatePatternDisplay();
+          updateUndoButton();
+          showSectionMessage('patternMessage', `✨ ${shiftInfo.label} added to pattern`, 'success');
+        }, 100);
+      }
+      
+      // Update the visual pattern display
+      function updatePatternDisplay() {
+        const container = document.getElementById('patternSequence');
+        
+        if (currentPattern.length === 0) {
+          container.innerHTML = '<div class="empty-pattern">Click buttons above to build your pattern</div>';
+          return;
+        }
+        
+        container.innerHTML = '';
+        
+        currentPattern.forEach((shift, index) => {
+          const item = document.createElement('div');
+          item.className = 'pattern-item';
+          item.style.backgroundColor = shift.color;
+          item.style.color = getContrastColor(shift.color);
+          
+          const durationText = formatDuration(shift.hours);
+          const durationClass = shift.hours === 0 ? 'zero-hours' : '';
+          
+          item.innerHTML = `
+            <div class="pattern-item-main">${shift.type}</div>
+            <div class="pattern-item-duration ${durationClass}">${durationText}</div>
+            <button class="remove-btn" onclick="removeShiftFromPattern(${index})">×</button>
+          `;
+          container.appendChild(item);
+        });
+        
+        // Update total hours display
+        updateTotalHours();
+      }
+      
+      // Update total hours display
+      function updateTotalHours() {
+        const totalHours = currentPattern.reduce((sum, shift) => sum + shift.hours, 0);
+        const patternActions = document.querySelector('.pattern-actions');
+        
+        // Remove existing total if present
+        const existingTotal = document.getElementById('patternTotal');
+        if (existingTotal) {
+          existingTotal.remove();
+        }
+        
+        if (currentPattern.length > 0) {
+          const totalDisplay = document.createElement('div');
+          totalDisplay.id = 'patternTotal';
+          totalDisplay.className = 'pattern-total';
+          totalDisplay.innerHTML = `
+            <strong>Total: ${formatDuration(totalHours)}</strong>
+            <span class="pattern-length">(${currentPattern.length} shifts)</span>
+          `;
+          
+          patternActions.parentNode.insertBefore(totalDisplay, patternActions);
+        }
+      }
+      
+      // Remove specific shift from pattern
+      function removeShiftFromPattern(index) {
+        showSectionMessage('patternMessage', 'Removing shift from pattern...', 'loading');
+        
+        setTimeout(() => {
+          currentPattern.splice(index, 1);
+          updatePatternDisplay();
+          updateUndoButton();
+          showSectionMessage('patternMessage', '🗑️ Shift removed from pattern', 'success');
+        }, 150);
+      }
+      
+      // Undo last added shift
+      function undoLastShift() {
+        if (currentPattern.length > 0) {
+          showSectionMessage('patternMessage', 'Undoing last shift...', 'loading');
+          
+          setTimeout(() => {
+            const removedShift = currentPattern.pop();
+            updatePatternDisplay();
+            updateUndoButton();
+            showSectionMessage('patternMessage', '↩️ Last shift removed', 'success');
+          }, 150);
+        }
+      }
+      
+      // Update undo button state
+      function updateUndoButton() {
+        const undoBtn = document.getElementById('undoLastBtn');
+        if (undoBtn) {
+          undoBtn.disabled = currentPattern.length === 0;
+        }
+      }
+      
+      // Date range functionality
+      let selectedDateRange = null;
+      
+      function initializeDateRange() {
+        console.log('=== INITIALIZING DATE RANGE ===');
+        
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const currentMonth = currentDate.getMonth() + 1;
+        
+        console.log('Current date:', currentDate.toString());
+        console.log('Current year:', currentYear);
+        console.log('Current month:', currentMonth);
+        
+        // Find the actual HTML elements that exist
+        const monthSelect = document.getElementById('monthSelect');
+        const yearSelect = document.getElementById('yearSelect');
+        const startDayInput = document.getElementById('startDayInput');
+        const endDayInput = document.getElementById('endDayInput');
+        
+        console.log('Elements found:');
+        console.log('- monthSelect:', !!monthSelect);
+        console.log('- yearSelect:', !!yearSelect);
+        console.log('- startDayInput:', !!startDayInput);
+        console.log('- endDayInput:', !!endDayInput);
+        
+        if (!monthSelect || !yearSelect) {
+          console.error('CRITICAL: Month or year select elements not found!');
+          return;
+        }
+        
+        // POPULATE YEAR DROPDOWN
+        console.log('Populating year dropdown...');
+        yearSelect.innerHTML = '';
+        
+        for (let year = currentYear - 1; year <= currentYear + 5; year++) {
+          const option = document.createElement('option');
+          option.value = year;
+          option.textContent = year;
+          if (year === currentYear) option.selected = true;
+          yearSelect.appendChild(option);
+          console.log('Added year:', year);
+        }
+        
+        console.log('Year dropdown populated with', yearSelect.children.length, 'options');
+        
+        // Set current month as default
+        if (monthSelect) {
+          monthSelect.value = currentMonth;
+          console.log('Set month to:', currentMonth);
+        }
+        
+        // Initialize day inputs
+        if (startDayInput) startDayInput.value = '1';
+        if (endDayInput) {
+          const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+          endDayInput.value = daysInMonth;
+          console.log('Set end day to:', daysInMonth);
+        }
+        
+        // Set up event listeners for all date-related inputs
+        const dateInputs = ['monthSelect', 'yearSelect', 'startDayInput', 'endDayInput'];
+        dateInputs.forEach(id => {
+          const element = document.getElementById(id);
+          if (element) {
+            element.addEventListener('change', updateDateRange);
+            element.addEventListener('input', updateDateRange);
+            console.log('Added listeners to:', id);
+          } else {
+            console.warn('Element not found for listener:', id);
+          }
+        });
+        
+        // Set up quick range buttons
+        const thisMonthBtn = document.getElementById('thisMonthBtn');
+        const nextMonthBtn = document.getElementById('nextMonthBtn');
+        
+        if (thisMonthBtn) thisMonthBtn.addEventListener('click', () => setQuickRange('thisMonth'));
+        if (nextMonthBtn) nextMonthBtn.addEventListener('click', () => setQuickRange('nextMonth'));
+        
+        // Initialize date range calculation
+        updateDateRange();
+        
+        console.log('=== DATE RANGE INITIALIZATION COMPLETE ===');
+      }
+      
+      
+      
+      function updateDateRange() {
+        console.log('=== UPDATE DATE RANGE CALLED ===');
+        
+        // Use the actual HTML elements that exist
+        const monthSelect = document.getElementById('monthSelect');
+        const yearSelect = document.getElementById('yearSelect');
+        const startDayInput = document.getElementById('startDayInput');
+        const endDayInput = document.getElementById('endDayInput');
+        
+        if (!monthSelect || !yearSelect) {
+          console.error('Month or year select elements not found');
+          return;
+        }
+        
+        const month = parseInt(monthSelect.value);
+        const year = parseInt(yearSelect.value);
+        const startDay = parseInt(startDayInput?.value || '1');
+        const endDay = parseInt(endDayInput?.value || '31');
+        
+        console.log('Date values:', { month, year, startDay, endDay });
+        
+        // Validate month and year
+        if (!month || !year || month < 1 || month > 12) {
+          console.error('Invalid month or year values');
+          return;
+        }
+        
+        // Get actual days in the selected month
+        const daysInMonth = new Date(year, month, 0).getDate();
+        console.log('Days in month:', daysInMonth);
+        
+        // Adjust end day if it exceeds days in month
+        const adjustedEndDay = Math.min(endDay, daysInMonth);
+        const adjustedStartDay = Math.max(1, Math.min(startDay, daysInMonth));
+        
+        console.log('Adjusted days:', { adjustedStartDay, adjustedEndDay });
+        
+        // Update end day input if it was adjusted
+        if (endDayInput && adjustedEndDay !== endDay) {
+          endDayInput.value = adjustedEndDay;
+        }
+        if (startDayInput && adjustedStartDay !== startDay) {
+          startDayInput.value = adjustedStartDay;
+        }
+        
+        // Create date objects
+        const startDate = new Date(year, month - 1, adjustedStartDay);
+        const endDate = new Date(year, month - 1, adjustedEndDay);
+        
+        // Validate date range
+        if (startDate > endDate) {
+          console.error('Start date is after end date');
+          selectedDateRange = null;
+          updateDateRangeDisplay('Invalid range: Start day must be before end day', false);
+          return;
+        }
+        
+        selectedDateRange = { startDate, endDate };
+        console.log('Selected date range:', selectedDateRange);
+        
+        // Update display
+        updateDateRangeDisplay(null, true);
+      }
+      
+      function updateDateRangeDisplay(errorMessage, isValid) {
+        const preview = document.getElementById('dateRangePreview');
+        if (!preview) return;
+        
+        if (errorMessage) {
+          preview.textContent = errorMessage;
+          preview.classList.remove('has-range');
+          return;
+        }
+        
+        if (!selectedDateRange) return;
+        
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                           'July', 'August', 'September', 'October', 'November', 'December'];
+        
+        const { startDate, endDate } = selectedDateRange;
+        const monthName = monthNames[startDate.getMonth()];
+        const year = startDate.getFullYear();
+        const startDay = startDate.getDate();
+        const endDay = endDate.getDate();
+        
+        if (startDay === 1 && endDay === new Date(year, startDate.getMonth() + 1, 0).getDate()) {
+          preview.textContent = `${monthName} ${year} (Full Month)`;
+        } else if (startDay === endDay) {
+          preview.textContent = `${monthName} ${startDay}, ${year}`;
+        } else {
+          preview.textContent = `${monthName} ${year} (Days ${startDay}-${endDay})`;
+        }
+        
+        if (isValid) {
+          preview.classList.add('has-range');
+        } else {
+          preview.classList.remove('has-range');
+        }
+      }
+      
+      function setQuickRange(type) {
+        console.log('Setting quick range:', type);
+        
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const currentMonth = currentDate.getMonth() + 1;
+        
+        let targetMonth, targetYear, startDay, endDay;
+        
+        switch (type) {
+          case 'thisMonth':
+            targetMonth = currentMonth;
+            targetYear = currentYear;
+            startDay = 1;
+            endDay = new Date(currentYear, currentMonth, 0).getDate();
+            break;
+            
+          case 'nextMonth':
+            const nextDate = new Date(currentYear, currentMonth, 1);
+            targetMonth = nextDate.getMonth() + 1;
+            targetYear = nextDate.getFullYear();
+            startDay = 1;
+            endDay = new Date(targetYear, targetMonth, 0).getDate();
+            break;
+        }
+        
+        // Update the actual form elements
+        const monthSelect = document.getElementById('monthSelect');
+        const yearSelect = document.getElementById('yearSelect');
+        const startDayInput = document.getElementById('startDayInput');
+        const endDayInput = document.getElementById('endDayInput');
+        
+        if (monthSelect) monthSelect.value = targetMonth;
+        if (yearSelect) yearSelect.value = targetYear;
+        if (startDayInput) startDayInput.value = startDay;
+        if (endDayInput) endDayInput.value = endDay;
+        
+        console.log('Quick range set to:', { targetMonth, targetYear, startDay, endDay });
+        
+        // Update the date range
+        updateDateRange();
+      }
+      
+      // Test connection to Apps Script
+      function testConnection() {
+        const testButton = document.getElementById('testButton');
+        testButton.disabled = true;
+        testButton.textContent = '🧪 Testing...';
+        
+        showMessage('Testing connection to Apps Script...', 'info');
+        
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              showMessage(`✅ Connection successful! ${result.message}`, 'success');
+            } else {
+              showMessage(`❌ Test failed: ${result.message}`, 'error');
+            }
+            testButton.disabled = false;
+            testButton.textContent = '🧪 Test Connection';
+          })
+          .withFailureHandler(function(error) {
+            showMessage(`❌ Connection failed: ${error.toString()}`, 'error');
+            console.error('Test connection error:', error);
+            testButton.disabled = false;
+            testButton.textContent = '🧪 Test Connection';
+          })
+          .testFunction();
+      }
+
+      // Initialize month selection interface
+      function initializeMonthSelection() {
+        console.log('=== INITIALIZING MONTH SELECTION ===');
+        
+        // Populate year dropdown
+        const yearSelect = document.getElementById('sheetCreationYear');
+        if (yearSelect) {
+          const currentYear = new Date().getFullYear();
+          yearSelect.innerHTML = '';
+          
+          // Add current year and next year options
+          for (let year = currentYear; year <= currentYear + 2; year++) {
+            const option = document.createElement('option');
+            option.value = year;
+            option.textContent = year;
+            if (year === currentYear) option.selected = true;
+            yearSelect.appendChild(option);
+          }
+        }
+        
+        // Set up quick select buttons
+        setupQuickSelectButtons();
+        
+        // Pre-select current quarter by default
+        selectCurrentQuarter();
+      }
+      
+      // Set up quick selection button event handlers
+      function setupQuickSelectButtons() {
+        const currentQuarterBtn = document.getElementById('selectCurrentQuarter');
+        const nextQuarterBtn = document.getElementById('selectNextQuarter');
+        const selectAllBtn = document.getElementById('selectAll');
+        const clearAllBtn = document.getElementById('clearAll');
+        
+        if (currentQuarterBtn) currentQuarterBtn.addEventListener('click', selectCurrentQuarter);
+        if (nextQuarterBtn) nextQuarterBtn.addEventListener('click', selectNextQuarter);
+        if (selectAllBtn) selectAllBtn.addEventListener('click', selectAllMonths);
+        if (clearAllBtn) clearAllBtn.addEventListener('click', clearAllMonths);
+      }
+      
+      // Quick select functions
+      function selectCurrentQuarter() {
+        const currentMonth = new Date().getMonth() + 1; // 1-based
+        const quarterStart = Math.floor((currentMonth - 1) / 3) * 3 + 1;
+        
+        clearAllMonths();
+        for (let i = 0; i < 3; i++) {
+          const month = quarterStart + i;
+          if (month <= 12) {
+            const checkbox = document.getElementById(`month-${month}`);
+            if (checkbox) checkbox.checked = true;
+          }
+        }
+      }
+      
+      function selectNextQuarter() {
+        const currentMonth = new Date().getMonth() + 1; // 1-based
+        let quarterStart = Math.floor((currentMonth - 1) / 3) * 3 + 4; // Next quarter
+        
+        clearAllMonths();
+        for (let i = 0; i < 3; i++) {
+          const month = quarterStart + i;
+          if (month <= 12) {
+            const checkbox = document.getElementById(`month-${month}`);
+            if (checkbox) checkbox.checked = true;
+          } else if (month > 12) {
+            // Handle year rollover - select months in next year
+            const nextYearMonth = month - 12;
+            const checkbox = document.getElementById(`month-${nextYearMonth}`);
+            if (checkbox) {
+              checkbox.checked = true;
+              // Also increment year selector
+              const yearSelect = document.getElementById('sheetCreationYear');
+              if (yearSelect && i === 0) { // Only increment once
+                yearSelect.value = parseInt(yearSelect.value) + 1;
+              }
+            }
+          }
+        }
+      }
+      
+      function selectAllMonths() {
+        for (let month = 1; month <= 12; month++) {
+          const checkbox = document.getElementById(`month-${month}`);
+          if (checkbox) checkbox.checked = true;
+        }
+      }
+      
+      function clearAllMonths() {
+        for (let month = 1; month <= 12; month++) {
+          const checkbox = document.getElementById(`month-${month}`);
+          if (checkbox) checkbox.checked = false;
+        }
+      }
+      
+      // Get selected months from checkboxes
+      function getSelectedMonths() {
+        const selectedMonths = [];
+        const selectedYear = parseInt(document.getElementById('sheetCreationYear').value);
+        
+        for (let month = 1; month <= 12; month++) {
+          const checkbox = document.getElementById(`month-${month}`);
+          if (checkbox && checkbox.checked) {
+            selectedMonths.push({ month: month, year: selectedYear });
+          }
+        }
+        
+        return selectedMonths;
+      }
+
+      // Create monthly sheets for selected months
+      function createMonthlySheets() {
+        const createButton = document.getElementById('createSheetsButton');
+        
+        // Get selected months from checkboxes
+        const selectedMonths = getSelectedMonths();
+        
+        if (selectedMonths.length === 0) {
+          showMessage('❌ Please select at least one month to create.', 'error');
+          return;
+        }
+        
+        createButton.disabled = true;
+        createButton.textContent = '📅 Creating...';
+        
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                           'July', 'August', 'September', 'October', 'November', 'December'];
+        
+        // Create user-friendly message
+        const monthNamesList = selectedMonths.map(m => `${monthNames[m.month - 1]} ${m.year}`).join(', ');
+        showMessage(`Creating ${selectedMonths.length} monthly sheet(s): ${monthNamesList}...`, 'info');
+        
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              showMessage(`✅ ${result.message}`, 'success');
+            } else {
+              showMessage(`❌ Failed: ${result.message}`, 'error');
+            }
+            createButton.disabled = false;
+            createButton.textContent = '📅 Create Selected Sheets';
+          })
+          .withFailureHandler(function(error) {
+            showMessage(`❌ Sheet creation failed: ${error.toString()}`, 'error');
+            console.error('Sheet creation error:', error);
+            createButton.disabled = false;
+            createButton.textContent = '📅 Create Selected Sheets';
+          })
+          .createSelectedMonthlySheets(selectedMonths);
+      }
+
+      // New simplified month preview function
+      function updateMonthPreview() {
+        const monthSelect = document.getElementById('monthSelect');
+        const yearSelect = document.getElementById('yearSelect');
+        const startDayInput = document.getElementById('startDayInput');
+        const endDayInput = document.getElementById('endDayInput');
+        const monthPreview = document.getElementById('monthPreview');
+        
+        if (!monthSelect || !yearSelect || !monthPreview) return;
+        
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                           'July', 'August', 'September', 'October', 'November', 'December'];
+        
+        const selectedMonth = parseInt(monthSelect.value);
+        const selectedYear = parseInt(yearSelect.value);
+        const startDay = parseInt(startDayInput?.value || '1');
+        const endDay = parseInt(endDayInput?.value || '31');
+        
+        // Get actual days in month
+        const daysInMonth = new Date(selectedYear, selectedMonth, 0).getDate();
+        const actualEndDay = Math.min(endDay, daysInMonth);
+        
+        // Update end day input if needed
+        if (endDayInput && endDay > daysInMonth) {
+          endDayInput.value = daysInMonth;
+        }
+        
+        const monthName = monthNames[selectedMonth - 1];
+        monthPreview.textContent = `${monthName} ${selectedYear} (Days ${startDay}-${actualEndDay})`;
+      }
+      
+      // Quick month selection
+      function setQuickMonth(type) {
+        const monthSelect = document.getElementById('monthSelect');
+        const yearSelect = document.getElementById('yearSelect');
+        const startDayInput = document.getElementById('startDayInput');
+        const endDayInput = document.getElementById('endDayInput');
+        
+        const now = new Date();
+        let targetMonth, targetYear;
+        
+        if (type === 'current') {
+          targetMonth = now.getMonth() + 1;
+          targetYear = now.getFullYear();
+        } else if (type === 'next') {
+          const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+          targetMonth = nextMonth.getMonth() + 1;
+          targetYear = nextMonth.getFullYear();
+        }
+        
+        if (monthSelect) monthSelect.value = targetMonth;
+        if (yearSelect) yearSelect.value = targetYear;
+        if (startDayInput) startDayInput.value = '1';
+        if (endDayInput) {
+          const daysInMonth = new Date(targetYear, targetMonth, 0).getDate();
+          endDayInput.value = daysInMonth;
+        }
+        
+        updateMonthPreview();
+      }
+
+      // Apply the shift pattern
+      function applyPattern() {
+        const staffName = document.getElementById('staffSelect').value;
+        
+        // Validate inputs
+        if (!staffName) {
+          showMessage('Please select a staff member.', 'error');
+          return;
+        }
+        
+        if (currentPattern.length === 0) {
+          showMessage('Please build a shift pattern using the buttons above.', 'error');
+          return;
+        }
+        
+        if (!selectedDateRange || selectedDateRange.startDate > selectedDateRange.endDate) {
+          showMessage('Please select a valid date range.', 'error');
+          return;
+        }
+        
+        // Convert pattern to string format for server
+        const patternString = currentPattern.map(shift => shift.type).join(',');
+        
+        // Show processing indicator
+        const applyButton = document.getElementById('applyButton');
+        applyButton.disabled = true;
+        applyButton.textContent = 'Applying Pattern...';
+        
+        // Add a loading spinner
+        const statusMessage = document.getElementById('statusMessage');
+        statusMessage.innerHTML = '<div class="spinner"></div> Processing... Applying pattern across selected date range.';
+        statusMessage.className = 'status-message info';
+        statusMessage.style.display = 'block';
+        
+        // Scroll to message to make sure it's visible
+        statusMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        
+        const daysDiff = Math.ceil((selectedDateRange.endDate - selectedDateRange.startDate) / (1000 * 60 * 60 * 24)) + 1;
+        
+        console.log('Applying pattern:', {
+          staffName, 
+          pattern: patternString,
+          dateRange: selectedDateRange,
+          totalDays: daysDiff,
+          patternLength: currentPattern.length
+        });
+        
+        // Check if this is a cross-month pattern or single month
+        const startMonth = selectedDateRange.startDate.getMonth();
+        const startYear = selectedDateRange.startDate.getFullYear();
+        const endMonth = selectedDateRange.endDate.getMonth();
+        const endYear = selectedDateRange.endDate.getFullYear();
+        
+        const isCrossMonth = (startYear !== endYear) || (startMonth !== endMonth);
+        
+        if (isCrossMonth) {
+          // Use enhanced cross-month function that auto-creates sheets
+          console.log('Cross-month pattern detected - using enhanced function');
+          
+          statusMessage.innerHTML = '<div class="spinner"></div> Cross-month pattern detected. Creating required sheets and applying pattern...';
+          
+          // Add timeout mechanism
+          let timeoutId = setTimeout(function() {
+            showMessage('<span class="error-icon">⚠</span> Operation timed out after 2 minutes. Please check Apps Script logs for details.', 'error');
+            applyButton.disabled = false;
+            applyButton.textContent = 'Apply Pattern to Selected Range';
+          }, 120000); // 2 minute timeout
+          
+          google.script.run
+            .withSuccessHandler(function(result) {
+              clearTimeout(timeoutId); // Clear timeout on success
+              if (result.success) {
+                // Show enhanced success message with details
+                let message = '<span class="success-icon">✓</span> ' + result.message;
+                if (result.sheetsCreated > 0) {
+                  message += `<br><strong>📋 Created ${result.sheetsCreated} new sheet(s)</strong>`;
+                }
+                showMessage(message, 'success');
+              } else {
+                showMessage('<span class="error-icon">✗</span> ' + result.message, 'error');
+              }
+              
+              applyButton.disabled = false;
+              applyButton.textContent = 'Apply Pattern to Selected Range';
+            })
+            .withFailureHandler(function(error) {
+              clearTimeout(timeoutId); // Clear timeout on failure
+              console.error('Error during cross-month pattern application:', error);
+              showError(`Error: ${error.toString()}<br><small>Check Apps Script execution log for details.</small>`);
+              applyButton.disabled = false;
+              applyButton.textContent = 'Apply Pattern to Selected Range';
+            })
+            .applyShiftPatternWithDateRange(staffName, patternString, selectedDateRange.startDate, selectedDateRange.endDate);
+        } else {
+          // Single month - use original function
+          console.log('Single month pattern - using original function');
+          
+          const startDay = selectedDateRange.startDate.getDate();
+          const endDay = selectedDateRange.endDate.getDate();
+          const selectedMonth = selectedDateRange.startDate.getMonth() + 1; // 1-based month
+          const selectedYear = selectedDateRange.startDate.getFullYear();
+          
+          console.log('Applying to specific month/year:', selectedMonth, selectedYear);
+          
+          google.script.run
+            .withSuccessHandler(function(result) {
+              if (result.success) {
+                showMessage('<span class="success-icon">✓</span> ' + result.message, 'success');
+              } else {
+                showMessage('<span class="error-icon">✗</span> ' + result.message, 'error');
+              }
+              
+              applyButton.disabled = false;
+              applyButton.textContent = 'Apply Pattern to Selected Range';
+            })
+            .withFailureHandler(function(error) {
+              console.error('Error during pattern application:', error);
+              showError(error);
+              applyButton.disabled = false;
+              applyButton.textContent = 'Apply Pattern to Selected Range';
+            })
+            .applyShiftPattern(staffName, patternString, startDay, endDay, selectedMonth, selectedYear);
+        }
+      }
+      
+      // Show a message
+      function showMessage(message, type) {
+        const messageElement = document.getElementById('statusMessage');
+        messageElement.innerHTML = message;
+        messageElement.className = 'status-message ' + type;
+        messageElement.style.display = 'block';
+        
+        // Scroll to message to make sure it's visible
+        messageElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        
+        // Only auto-hide success messages after a longer delay
+        if (type === 'success') {
+          setTimeout(function() {
+            // Fade out instead of immediate hide
+            messageElement.style.opacity = '0';
+            setTimeout(function() {
+              messageElement.style.display = 'none';
+              messageElement.style.opacity = '1';
+            }, 500);
+          }, 8000); // Increased from 5000 to 8000ms
+        }
+      }
+      
+      // Show message in specific section
+      function showSectionMessage(sectionId, message, type) {
+        const messageElement = document.getElementById(sectionId);
+        if (!messageElement) return;
+        
+        // Add spinner for loading messages
+        if (type === 'loading') {
+          messageElement.innerHTML = '<span class="section-spinner"></span>' + message;
+        } else {
+          messageElement.innerHTML = message;
+        }
+        
+        messageElement.className = 'section-message ' + type;
+        messageElement.style.display = 'block';
+        
+        // Auto-hide success and error messages
+        if (type === 'success' || type === 'error') {
+          setTimeout(function() {
+            messageElement.style.opacity = '0';
+            setTimeout(function() {
+              messageElement.style.display = 'none';
+              messageElement.style.opacity = '1';
+            }, 300);
+          }, type === 'success' ? 5000 : 7000);
+        }
+      }
+      
+      // Hide section message
+      function hideSectionMessage(sectionId) {
+        const messageElement = document.getElementById(sectionId);
+        if (messageElement) {
+          messageElement.style.display = 'none';
+        }
+      }
+      
+      // Show error
+      function showError(error) {
+        showMessage('<span class="error-icon">✗</span> Error: ' + error.message, 'error');
+      }
+      
+      // Helper function to determine text color based on background
+      function getContrastColor(hexColor) {
+        // Convert hex to RGB
+        const r = parseInt(hexColor.substr(1, 2), 16);
+        const g = parseInt(hexColor.substr(3, 2), 16);
+        const b = parseInt(hexColor.substr(5, 2), 16);
+        
+        // Calculate brightness
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        
+        // Return black or white based on brightness
+        return brightness > 128 ? '#000000' : '#ffffff';
+      }
+      
+      // Load existing custom shifts and add them to the UI
+      function loadExistingCustomShifts(patterns) {
+        Object.keys(patterns).forEach(shiftType => {
+          const pattern = patterns[shiftType];
+          if (pattern.custom) {
+            customShifts[shiftType] = pattern;
+            addCustomShiftToQuickAdd(shiftType, pattern);
+          }
+        });
+      }
+      
+      // Clear the pattern
+      function clearPattern() {
+        showSectionMessage('patternMessage', 'Clearing pattern...', 'loading');
+        
+        setTimeout(() => {
+          currentPattern = [];
+          updatePatternDisplay();
+          updateUndoButton();
+          showSectionMessage('patternMessage', '✨ Pattern cleared', 'success');
+        }, 200);
+      }
+      
+      // Custom shift functionality
+      let customShifts = {}; // Store custom shifts created by user
+      
+      function addCustomShiftToQuickAdd(shiftName, shiftInfo) {
+        const grid = document.querySelector('.quick-shifts-grid');
+        const addCustomBtn = document.getElementById('addCustomShiftBtn');
+        
+        // Create new button for this custom shift
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'quick-shift-btn custom-shift-btn';
+        button.setAttribute('data-shift', shiftName);
+        button.style.background = `linear-gradient(135deg, ${shiftInfo.color}, ${adjustBrightness(shiftInfo.color, -20)})`;
+        button.style.color = getContrastColor(shiftInfo.color);
+        button.textContent = `+ ${shiftName}`;
+        
+        // Add event listener
+        button.addEventListener('click', function() {
+          addShiftToPattern(shiftName, shiftInfo);
+        });
+        
+        // Insert before the "Add Custom" button
+        grid.insertBefore(button, addCustomBtn);
+      }
+      
+      function adjustBrightness(color, amount) {
+        const usePound = color[0] === '#';
+        const col = usePound ? color.slice(1) : color;
+        const num = parseInt(col, 16);
+        let r = (num >> 16) + amount;
+        let g = (num >> 8 & 0x00FF) + amount;
+        let b = (num & 0x0000FF) + amount;
+        r = r > 255 ? 255 : r < 0 ? 0 : r;
+        g = g > 255 ? 255 : g < 0 ? 0 : g;
+        b = b > 255 ? 255 : b < 0 ? 0 : b;
+        return (usePound ? '#' : '') + (r << 16 | g << 8 | b).toString(16).padStart(6, '0');
+      }
+    </script>
+  </body>
+</html> 
