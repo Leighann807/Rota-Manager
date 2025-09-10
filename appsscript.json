@@ -27,8 +27,8 @@
         "enabled": true
       },
       "universalActions": [{
-        "label": "Create Rota Sheet",
-        "runFunction": "createRotaSheet"
+        "label": "Generate Monthly Rota",
+        "runFunction": "showRotaGenerator"
       }]
     },
     "sheets": {
@@ -40,9 +40,9 @@
         "runFunction": "onAuthorizationRequired"
       },
       "macros": [{
-        "menuName": "Create New Rota Sheet",
-        "functionName": "createRotaSheet",
-        "defaultShortcut": "Ctrl+Alt+Shift+N"
+        "menuName": "Generate Monthly Rota", 
+        "functionName": "showRotaGenerator",
+        "defaultShortcut": "Ctrl+Alt+Shift+R"
       }]
     }
   }

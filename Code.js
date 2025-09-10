@@ -238,8 +238,6 @@ function onOpen() {
   try {
     const ui = SpreadsheetApp.getUi();
     ui.createMenu('Staff Rota')
-      .addItem('📅 Create New Rota Sheet', 'createRotaSheet')
-      .addSeparator()
       .addItem('🔄 Generate Monthly Rota', 'showRotaGenerator')
       .addSeparator()
       .addItem('🏥 Log New Absence', 'showAbsenceLogger')
@@ -262,7 +260,7 @@ function onOpen() {
     // Fallback: create basic menu
     try {
       SpreadsheetApp.getUi().createMenu('Staff Rota')
-        .addItem('Create New Rota Sheet', 'createRotaSheet')
+        .addItem('Generate Monthly Rota', 'showRotaGenerator')
         .addItem('Help', 'showHelp')
         .addToUi();
     } catch (fallbackError) {
@@ -271,136 +269,8 @@ function onOpen() {
   }
 }
 
-/**
- * Shows the rota sheet creation dialog with clear options
- */
-function createRotaSheet() {
-  const html = HtmlService.createHtmlOutputFromFile('CreateRotaDialog')
-    .setWidth(500)
-    .setHeight(400);
-  
-  SpreadsheetApp.getUi().showModalDialog(html, 'Create Rota Sheets');
-}
 
-/**
- * Creates new rota sheets - called from the HTML dialog
- */
-function createRotaSheetFromDialog(mode, params) {
-  try {
-    Logger.log(`createRotaSheetFromDialog: mode=${mode}, importStaff=${params.importStaff}`);
-    if (mode === 'single') {
-      return createSingleRotaSheetInternal(params.month, params.year, params.importStaff);
-    } else if (mode === 'multiple') {
-      return createMultipleRotaSheetsInternal(params.year, params.months, params.importStaff);
-    } else {
-      throw new Error('Invalid mode');
-    }
-  } catch (error) {
-    Logger.log('createRotaSheetFromDialog: Error: ' + error.message);
-    return {
-      success: false,
-      message: error.message
-    };
-  }
-}
 
-/**
- * Creates a single rota sheet for a specific month/year - called from dialog
- */
-function createSingleRotaSheetInternal(month, year, importStaff) {
-  try {
-    const shouldImportStaff = (importStaff === true || importStaff === 'true');
-    Logger.log(`createSingleRotaSheetInternal: month=${month}, year=${year}, importStaff=${importStaff} (converted to ${shouldImportStaff})`);
-    // Validation
-    if (isNaN(month) || month < 1 || month > 12) {
-      return { success: false, message: 'Invalid month. Must be between 1 and 12.' };
-    }
-    
-    if (isNaN(year) || year < 2000 || year > 3000) {
-      return { success: false, message: 'Invalid year. Must be between 2000 and 3000.' };
-    }
-    
-    // Create the sheet
-    const sheet = createRotaSheetInternal(month, year);
-    
-    if (shouldImportStaff) {
-      Logger.log('createSingleRotaSheetInternal: Executing importStaffToSheet.');
-      importStaffToSheet(sheet);
-    }
-    
-    return {
-      success: true,
-      message: `Rota sheet for ${getMonthName(month)} ${year} created successfully`,
-      created: [sheet.getName()],
-      skipped: [],
-      failed: []
-    };
-  } catch (error) {
-    Logger.log('createSingleRotaSheetInternal: Error: ' + error.message);
-    return {
-      success: false,
-      message: error.message
-    };
-  }
-}
-
-/**
- * Creates multiple rota sheets for selected months in a year - called from dialog
- */
-function createMultipleRotaSheetsInternal(year, months, importStaff) {
-  try {
-    const shouldImportStaff = (importStaff === true || importStaff === 'true');
-    Logger.log(`createMultipleRotaSheetsInternal: year=${year}, months=${months.join(', ')}, importStaff=${importStaff} (converted to ${shouldImportStaff})`);
-    // Validation
-    if (isNaN(year) || year < 2000 || year > 3000) {
-      return { success: false, message: 'Invalid year. Must be between 2000 and 3000.' };
-    }
-    
-    if (!months || months.length === 0) {
-      return { success: false, message: 'No months selected.' };
-    }
-    
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                       'July', 'August', 'September', 'October', 'November', 'December'];
-    
-    const created = [];
-    const skipped = [];
-    const failed = [];
-    
-    for (const month of months) {
-      try {
-        const sheet = createRotaSheetInternal(month, year);
-        
-        if (shouldImportStaff) {
-          Logger.log(`createMultipleRotaSheetsInternal: Executing importStaffToSheet for ${getMonthName(month)} ${year}.`);
-          importStaffToSheet(sheet);
-        }
-        
-        created.push(sheet.getName());
-      } catch (error) {
-        if (error.message.includes('already exists')) {
-          skipped.push(getMonthName(month) + ' ' + year);
-        } else {
-          failed.push(getMonthName(month) + ' ' + year + ' (' + error.message + ')');
-        }
-      }
-    }
-    
-    return {
-      success: true,
-      message: `Created ${created.length} sheets, skipped ${skipped.length}, failed ${failed.length}`,
-      created: created,
-      skipped: skipped,
-      failed: failed
-    };
-  } catch (error) {
-    Logger.log('createMultipleRotaSheetsInternal: Error: ' + error.message);
-    return {
-      success: false,
-      message: error.message
-    };
-  }
-}
 
 /**
  * Shows the rota generator in a full-sized popup window.

@@ -24,12 +24,11 @@ All 10 files successfully transferred:
 2. **appsscript.json** - Project configuration
 3. **AbsenceLogger.html** - Absence logging interface
 4. **AbsenceReports.html** - Absence reporting interface
-5. **CreateRotaDialog.html** - Rota creation dialog
-6. **Help.html** - Help and documentation
-7. **Homepage.html** - Add-on homepage
-8. **PrivacyPolicy.html** - Privacy policy page
-9. **RotaGenerator.html** - Rota generation interface
-10. **Settings.html** - Settings page
+5. **Help.html** - Help and documentation
+6. **Homepage.html** - Add-on homepage
+7. **PrivacyPolicy.html** - Privacy policy page
+8. **RotaGenerator.html** - Rota generation interface
+9. **Settings.html** - Settings page
 
 ## Transfer Process
 
