@@ -329,9 +329,6 @@
             <button class="btn btn-secondary" id="addStaffButton">
               ➕ Add New Staff
             </button>
-            <button class="btn btn-secondary" id="importStaffButton">
-              📥 Import Staff List
-            </button>
           </div>
 
           <div id="staffList" class="staff-list">
@@ -474,7 +471,6 @@
         // Set up event handlers
         document.getElementById('saveSettingsButton').addEventListener('click', saveSettings);
         document.getElementById('addStaffButton').addEventListener('click', () => showStaffModal());
-        document.getElementById('importStaffButton').addEventListener('click', showImportStaffDialog);
         document.getElementById('backupButton').addEventListener('click', createBackup);
         document.getElementById('exportRotaButton').addEventListener('click', exportRotaData);
         document.getElementById('staffForm').addEventListener('submit', handleStaffFormSubmit);
@@ -746,12 +742,6 @@
 
       function editStaff(staffId) {
         showStaffModal(staffId);
-      }
-      
-      // Show import staff dialog
-      function showImportStaffDialog() {
-        showMessage('Import staff feature will open a file selection dialog.', 'info');
-        // This would typically show a file upload dialog
       }
       
       // Create backup
