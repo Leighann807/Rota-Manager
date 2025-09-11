@@ -320,19 +320,35 @@
       <div class="content">
         <!-- Staff Management Section -->
         <div class="section staff">
-          <div class="section-title">Staff Management</div>
+          <div class="section-title">👥 Staff Management</div>
           <div class="info-text">
-            Manage staff members and their details for rota generation.
+            Set up your team members for rota scheduling. Each staff member needs basic details and their annual leave entitlement.
           </div>
           
-          <div class="button-group">
-            <button class="btn btn-secondary" id="addStaffButton">
-              ➕ Add New Staff
+          <!-- Step-by-step Guide -->
+          <div style="background: #f0f8ff; border: 1px solid #4285f4; border-radius: 6px; padding: 15px; margin: 15px 0;">
+            <div style="font-weight: 600; color: #1a73e8; margin-bottom: 10px;">📋 Getting Started:</div>
+            <ol style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.6;">
+              <li><strong>Add your first team member</strong> using the button below</li>
+              <li><strong>Enter their details:</strong> Name, email, role, and annual leave days</li>
+              <li><strong>Repeat for each team member</strong> - you can edit or remove them later</li>
+              <li><strong>Annual leave</strong> is set per person (some may have different entitlements)</li>
+            </ol>
+          </div>
+          
+          <div style="text-align: center; margin: 20px 0;">
+            <button class="btn btn-primary" id="addStaffButton" style="padding: 12px 30px; font-size: 16px; font-weight: 600;">
+              ➕ Add Your First Team Member
             </button>
           </div>
 
           <div id="staffList" class="staff-list">
             <!-- Staff list will be populated here -->
+          </div>
+          
+          <!-- Quick Stats -->
+          <div id="staffStats" style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-top: 15px; font-size: 14px; color: #666; text-align: center;">
+            <span id="staffCount">0</span> team members added
           </div>
         </div>
 
@@ -436,17 +452,37 @@
           </div>
           <form id="staffForm">
             <input type="hidden" id="staffId">
-            <div class="form-group">
-              <label for="staffName">Full Name:</label>
-              <input type="text" id="staffName" required>
+            
+            <!-- Personal Details Section -->
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+              <div style="font-weight: 600; margin-bottom: 15px; color: #333;">👤 Personal Details</div>
+              <div class="form-group">
+                <label for="staffName">Full Name: <span style="color: #dc3545;">*</span></label>
+                <input type="text" id="staffName" required placeholder="e.g., John Smith">
+              </div>
+              <div class="form-group">
+                <label for="staffEmail">Email Address: <span style="color: #dc3545;">*</span></label>
+                <input type="email" id="staffEmail" required placeholder="e.g., john.smith@company.com">
+              </div>
+              <div class="form-group">
+                <label for="staffRole">Job Role/Position: <span style="color: #dc3545;">*</span></label>
+                <input type="text" id="staffRole" required placeholder="e.g., Nurse, Manager, Assistant">
+              </div>
             </div>
-            <div class="form-group">
-              <label for="staffEmail">Email:</label>
-              <input type="email" id="staffEmail" required>
-            </div>
-            <div class="form-group">
-              <label for="staffRole">Role:</label>
-              <input type="text" id="staffRole" required>
+            
+            <!-- Annual Leave Section -->
+            <div style="background: #e8f5e8; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+              <div style="font-weight: 600; margin-bottom: 10px; color: #333;">📅 Annual Leave Entitlement</div>
+              <div style="font-size: 13px; color: #666; margin-bottom: 15px;">
+                Set this person's annual leave allowance for the current tax year. This can be different for each team member.
+              </div>
+              <div class="form-group">
+                <label for="staffAnnualLeave">Annual Leave Days: <span style="color: #dc3545;">*</span></label>
+                <input type="number" id="staffAnnualLeave" required min="0" max="365" value="25" placeholder="25">
+                <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                  💡 Tip: UK standard is usually 25-28 days. Part-time staff may have pro-rated entitlement.
+                </div>
+              </div>
             </div>
             <div class="button-group">
               <button type="button" class="btn btn-secondary" onclick="closeStaffModal()">
@@ -618,24 +654,40 @@
 
       function renderStaffList() {
         const staffListElement = document.getElementById('staffList');
+        const staffCountElement = document.getElementById('staffCount');
+        const addButton = document.getElementById('addStaffButton');
+        
         staffListElement.innerHTML = '';
-
+        
+        // Update staff count
+        staffCountElement.textContent = staffList.length;
+        
+        // Update button text based on whether staff exist
         if (staffList.length === 0) {
-          staffListElement.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">No staff members added yet. Click "Add New Staff" to get started.</div>';
+          addButton.innerHTML = '➕ Add Your First Team Member';
+          staffListElement.innerHTML = '<div style="text-align: center; color: #666; padding: 20px; background: #f8f9fa; border-radius: 6px; border: 2px dashed #ddd;">👥 No team members added yet.<br><br>Click the button above to add your first team member and get started!</div>';
           return;
+        } else {
+          addButton.innerHTML = '➕ Add Another Team Member';
         }
 
         staffList.forEach(staff => {
           const staffItem = document.createElement('div');
           staffItem.className = 'staff-item';
+          const annualLeave = staff.annualLeave || 25; // Default to 25 if not set
+          
           staffItem.innerHTML = `
             <div class="staff-info">
-              <div class="name">${staff.name}</div>
-              <div class="details">${staff.role} • ${staff.email}</div>
+              <div class="name">👤 ${staff.name}</div>
+              <div class="details" style="margin-top: 4px;">
+                <div><strong>Role:</strong> ${staff.role}</div>
+                <div><strong>Email:</strong> ${staff.email}</div>
+                <div style="color: #4285f4;"><strong>📅 Annual Leave:</strong> ${annualLeave} days per year</div>
+              </div>
             </div>
             <div class="staff-actions">
-              <button class="btn btn-secondary" onclick="editStaff('${staff.id}')">✏️ Edit</button>
-              <button class="btn btn-danger" onclick="deleteStaff('${staff.id}')">🗑️</button>
+              <button class="btn btn-secondary" onclick="editStaff('${staff.id}')" title="Edit staff member">✏️ Edit</button>
+              <button class="btn btn-danger" onclick="deleteStaff('${staff.id}')" title="Remove staff member">🗑️ Remove</button>
             </div>
           `;
           staffListElement.appendChild(staffItem);
@@ -657,9 +709,11 @@
             document.getElementById('staffName').value = staff.name;
             document.getElementById('staffEmail').value = staff.email;
             document.getElementById('staffRole').value = staff.role;
+            document.getElementById('staffAnnualLeave').value = staff.annualLeave || 25;
           }
         } else {
           form.reset();
+          document.getElementById('staffAnnualLeave').value = 25; // Set default
         }
         
         modal.style.display = 'block';
@@ -678,7 +732,8 @@
           id: document.getElementById('staffId').value,
           name: document.getElementById('staffName').value,
           email: document.getElementById('staffEmail').value,
-          role: document.getElementById('staffRole').value
+          role: document.getElementById('staffRole').value,
+          annualLeave: parseInt(document.getElementById('staffAnnualLeave').value) || 25
         };
 
         if (editingStaffId) {
