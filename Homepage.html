@@ -156,6 +156,9 @@
         <button class="btn" onclick="openHelp()">
           ❓ Help
         </button>
+        <button class="btn" onclick="openSettings()">
+          ⚙️ Settings
+        </button>
       </div>
       
       <div class="footer">
@@ -194,6 +197,10 @@
       
       function showPrivacy() {
         google.script.run.showPrivacyPolicy();
+      }
+      
+      function openSettings() {
+        google.script.run.showSettings();
       }
       
       function showMessage(message, type) {

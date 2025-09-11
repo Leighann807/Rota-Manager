@@ -307,14 +307,14 @@ function showAbsenceReports() {
 }
 
 /**
- * Shows the settings sidebar.
+ * Shows the settings popup dialog.
  */
 function showSettings() {
-  const html = HtmlService.createHtmlOutputFromFile('Settings')
-    .setTitle('Staff Rota Settings')
-    .setWidth(400);
+  const html = HtmlService.createHtmlOutputFromFile('SettingsDialog')
+    .setWidth(800)
+    .setHeight(700);
   
-  SpreadsheetApp.getUi().showSidebar(html);
+  SpreadsheetApp.getUi().showModelessDialog(html, '⚙️ Staff Rota Settings');
 }
 
 /**
