@@ -159,6 +159,57 @@ Added comprehensive logging throughout the rota generation process:
 - **New Features Added**: Test connectivity, enhanced debugging, timeout protection
 - **Code Quality**: Significantly improved error handling and logging
 
+## Settings Interface Redesign (September 11, 2025)
+
+### Issue #3: Settings Sidebar to Popup Conversion
+**Problem:** User requested Settings interface be converted from sidebar to popup dialog for consistency with other features.
+
+**Solution Implemented:**
+- Created new `SettingsDialog.html` with modern popup design
+- Updated `showSettings()` function in `Code.js` to use popup instead of sidebar
+- Added Settings button to Homepage interface for easy access
+- Maintained all existing functionality while improving user experience
+
+**Design Improvements:**
+1. **Modern Card-Based Layout**: Clean sections with proper visual hierarchy
+2. **Better Section Naming**: 
+   - "Absence Settings" → "Annual Leave Settings" (more accurate)
+   - "Privacy & Analytics" → "Privacy & Data" (simpler language)
+3. **Enhanced Visual Design**:
+   - Colored card boxes for privacy options
+   - Clear icons and better spacing  
+   - Improved button styling
+   - Responsive layout for popup format
+
+**Features Maintained:**
+- Staff Management (add, edit, delete staff with modal interface)
+- Annual Leave Settings (default allowance configuration)
+- Privacy & Data Controls (analytics, notifications, data rights)
+- Backup & Export functionality (spreadsheet backup and data export)
+
+**Files Modified:**
+- `SettingsDialog.html`: New popup interface (created)
+- `Code.js`: Updated `showSettings()` function to show popup
+- `Homepage.html`: Added Settings button and handler function
+
+**Technical Changes:**
+- Changed from `showSidebar()` to `showModelessDialog()` with 800x700 dimensions
+- Improved UX with better explanations in plain English
+- Enhanced visual feedback and status messages
+
+### Current Status (End of Session - September 11, 2025)
+- ✅ **Settings Popup**: Complete redesign successfully deployed
+- ✅ **User Experience**: Consistent popup interface across all features
+- ✅ **Visual Design**: Modern, user-friendly interface with clear language
+- ✅ **All Functionality**: Maintained while improving usability
+
+### Deployment Summary
+- **Google Apps Script**: All files deployed via clasp push
+- **GitHub Repository**: 3 commits pushed to main branch
+  - `dbb628b`: Convert Settings from sidebar to popup dialog  
+  - `890ffeb`: Fix Annual Leave Settings section title and description
+  - `7eadfb5`: Redesign Privacy & Data section with better visuals and simpler language
+
 ---
 *Development completed using Claude Code CLI assistant*
 *Project continues to be actively debugged and improved*
