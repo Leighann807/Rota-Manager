@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      .container {
+        padding: 15px;
+        font-family: Arial, sans-serif;
+      }
+      
+      .form-group {
+        margin-bottom: 15px;
+      }
+      
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+      
+      select, input, textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+      
+      textarea {
+        height: 80px;
+        resize: vertical;
+      }
+      
+      .button-container {
+        margin-top: 20px;
+        text-align: right;
+      }
+      
+      button {
+        padding: 8px 15px;
+        background-color: #4285f4;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-left: 10px;
+      }
+      
+      button:hover {
+        background-color: #3367d6;
+      }
+      
+      button.cancel {
+        background-color: #f5f5f5;
+        color: #333;
+      }
+      
+      button.cancel:hover {
+        background-color: #e0e0e0;
+      }
+      
+      .status-message {
+        margin-top: 15px;
+        padding: 10px;
+        border-radius: 4px;
+      }
+      
+      .success {
+        background-color: #d6f5d6;
+        color: #2e7d32;
+      }
+      
+      .error {
+        background-color: #ffcdd2;
+        color: #c62828;
+      }
+      
+      .info-text {
+        font-size: 12px;
+        color: #666;
+        margin-top: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Log New Absence</h2>
+      
+      <div class="form-group">
+        <label for="staffNameSelect">Staff Member:</label>
+        <select id="staffNameSelect">
+          <option value="">Loading staff...</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="absenceTypeSelect">Absence Type:</label>
+        <select id="absenceTypeSelect">
+          <option value="Annual Leave">Annual Leave</option>
+          <option value="Sick Leave">Sick Leave</option>
+          <option value="Training">Training</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="startDateInput">Start Date:</label>
+        <input type="date" id="startDateInput">
+        <div class="info-text">First day of absence</div>
+      </div>
+      
+      <div class="form-group">
+        <label for="endDateInput">End Date:</label>
+        <input type="date" id="endDateInput">
+        <div class="info-text">Last day of absence</div>
+      </div>
+      
+      <div class="form-group">
+        <label for="reasonTextarea">Reason/Notes:</label>
+        <textarea id="reasonTextarea" placeholder="Enter details about this absence..."></textarea>
+      </div>
+      
+      <div id="statusMessage" style="display: none;" class="status-message"></div>
+      
+      <div class="button-container">
+        <button class="cancel" onclick="google.script.host.close()">Cancel</button>
+        <button id="submitButton" onclick="submitAbsence()">Log Absence</button>
+      </div>
+    </div>
+    
+    <script>
+      // Initialize the form
+      document.addEventListener('DOMContentLoaded', function() {
+        // Load staff names from both Settings and sheet
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              populateStaffDropdown(result.staff);
+            } else {
+              handleError('Error loading staff names: ' + result.message);
+            }
+          })
+          .withFailureHandler(handleError)
+          .getAllAvailableStaff();
+        
+        // Set default dates
+        const today = new Date();
+        document.getElementById('startDateInput').valueAsDate = today;
+        document.getElementById('endDateInput').valueAsDate = today;
+      });
+      
+      // Populate staff dropdown
+      function populateStaffDropdown(staffNames) {
+        const select = document.getElementById('staffNameSelect');
+        select.innerHTML = '';
+        
+        if (staffNames.length === 0) {
+          const option = document.createElement('option');
+          option.value = '';
+          option.textContent = 'No staff members found';
+          select.appendChild(option);
+          return;
+        }
+        
+        // Add default empty option
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = '-- Select Staff Member --';
+        select.appendChild(defaultOption);
+        
+        // Add staff names - handle both string and object formats
+        staffNames.forEach(function(staff) {
+          const option = document.createElement('option');
+          // Check if staff is an object with name property or just a string
+          if (typeof staff === 'object' && staff.name) {
+            option.value = staff.name;
+            option.textContent = staff.name;
+          } else {
+            option.value = staff;
+            option.textContent = staff;
+          }
+          select.appendChild(option);
+        });
+      }
+      
+      // Submit the absence
+      function submitAbsence() {
+        // Get form values
+        const staffName = document.getElementById('staffNameSelect').value;
+        const absenceType = document.getElementById('absenceTypeSelect').value;
+        const startDate = document.getElementById('startDateInput').value;
+        const endDate = document.getElementById('endDateInput').value;
+        const reason = document.getElementById('reasonTextarea').value;
+        
+        // Validate form
+        if (!staffName) {
+          showMessage('Please select a staff member.', 'error');
+          return;
+        }
+        
+        if (!startDate) {
+          showMessage('Please select a start date.', 'error');
+          return;
+        }
+        
+        if (!endDate) {
+          showMessage('Please select an end date.', 'error');
+          return;
+        }
+        
+        // Validate date range
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        
+        if (end < start) {
+          showMessage('End date cannot be before start date.', 'error');
+          return;
+        }
+        
+        // Disable submit button
+        const submitButton = document.getElementById('submitButton');
+        submitButton.disabled = true;
+        submitButton.textContent = 'Logging...';
+        
+        // Submit to server
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              showMessage(result.message, 'success');
+              
+              // Reset form after success
+              document.getElementById('staffNameSelect').selectedIndex = 0;
+              document.getElementById('absenceTypeSelect').selectedIndex = 0;
+              document.getElementById('reasonTextarea').value = '';
+              
+              // Close dialog after a delay
+              setTimeout(function() {
+                google.script.host.close();
+              }, 1500);
+            } else {
+              showMessage(result.message, 'error');
+              submitButton.disabled = false;
+              submitButton.textContent = 'Log Absence';
+            }
+          })
+          .withFailureHandler(function(error) {
+            handleError(error);
+            submitButton.disabled = false;
+            submitButton.textContent = 'Log Absence';
+          })
+          .logAbsence(staffName, absenceType, startDate, endDate, reason);
+      }
+      
+      // Show status message
+      function showMessage(message, type) {
+        const messageElement = document.getElementById('statusMessage');
+        messageElement.textContent = message;
+        messageElement.className = 'status-message ' + type;
+        messageElement.style.display = 'block';
+      }
+      
+      // Handle errors
+      function handleError(error) {
+        showMessage('Error: ' + error.message, 'error');
+      }
+    </script>
+  </body>
+</html> 

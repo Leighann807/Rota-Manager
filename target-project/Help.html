@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        color: #333;
+        line-height: 1.6;
+      }
+      
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      
+      h1 {
+        color: #1a73e8;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      
+      h2 {
+        color: #1a73e8;
+        margin-top: 30px;
+        margin-bottom: 15px;
+      }
+      
+      h3 {
+        color: #202124;
+        margin-top: 20px;
+        margin-bottom: 10px;
+      }
+      
+      .feature-section {
+        margin-bottom: 30px;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #1a73e8;
+      }
+      
+      .steps {
+        background-color: #e8f0fe;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+      }
+      
+      .steps ol {
+        margin: 0;
+        padding-left: 20px;
+      }
+      
+      .steps li {
+        margin: 5px 0;
+      }
+      
+      .highlight {
+        background-color: #fef7e0;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-weight: 500;
+      }
+      
+      .menu-path {
+        background-color: #e6f4ea;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-family: monospace;
+        font-weight: 500;
+        color: #137333;
+      }
+      
+      .tip {
+        background-color: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 6px;
+        padding: 10px 15px;
+        margin: 15px 0;
+      }
+      
+      .tip strong {
+        color: #b8860b;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>📋 Staff Rota Manager - Help & Documentation</h1>
+      
+      <div class="feature-section">
+        <h2>🔄 Generate Monthly Rota</h2>
+        <p>Create and manage monthly staff rotas with ease.</p>
+        
+        <h3>How to Access:</h3>
+        <div class="menu-path">Staff Rota → 🔄 Generate Monthly Rota</div>
+        
+        <h3>Features:</h3>
+        <div class="steps">
+          <ol>
+            <li><strong>📅 Monthly Sheet Setup:</strong> Create and configure monthly rota sheets
+              <ul>
+                <li>Generate new monthly sheets for specific months</li>
+                <li>Choose from quarter shortcuts (Q1, Q2, Q3, Q4) or select individual months</li>
+                <li>Automatically imports all staff from Settings and existing sheets</li>
+                <li>Sets up annual leave entitlements and formulas</li>
+              </ul>
+            </li>
+            <li><strong>🎯 Apply Shift Patterns:</strong> Generate shift rotas on your monthly sheets
+              <ul>
+                <li>Select from various rota patterns (7-day cycle, 14-day cycle, etc.)</li>
+                <li>Customize staffing levels for different shift types</li>
+                <li>Preview before applying to sheets</li>
+                <li>Apply patterns to multiple months at once</li>
+              </ul>
+            </li>
+          </ol>
+        </div>
+        
+        <div class="tip">
+          <strong>💡 Tip:</strong> The Generate Monthly Rota dialog handles both sheet creation and pattern application in one convenient interface.
+        </div>
+      </div>
+      
+      <div class="feature-section">
+        <h2>🏥 Log New Absence</h2>
+        <p>Record staff absences and automatically update monthly rotas.</p>
+        
+        <h3>How to Access:</h3>
+        <div class="menu-path">Staff Rota → 🏥 Log New Absence</div>
+        
+        <h3>What it Does:</h3>
+        <div class="steps">
+          <ol>
+            <li>Creates record in <span class="highlight">Absence Tracker</span> sheet</li>
+            <li>Automatically updates monthly rota sheets with absence codes:
+              <ul>
+                <li><strong>AL</strong> - Annual Leave (paid)</li>
+                <li><strong>SICK</strong> - Sick Leave (unpaid but counted)</li>
+                <li><strong>TRAINING</strong> - Training (paid and counted)</li>
+              </ul>
+            </li>
+            <li>Handles multi-day absences across multiple months</li>
+            <li>Updates payroll calculations automatically</li>
+          </ol>
+        </div>
+      </div>
+      
+      <div class="feature-section">
+        <h2>📊 View Absence Reports</h2>
+        <p>Generate reports and statistics on staff absences.</p>
+        
+        <h3>How to Access:</h3>
+        <div class="menu-path">Staff Rota → 📊 View Absence Reports</div>
+        
+        <h3>Available Reports:</h3>
+        <ul>
+          <li>Staff absence summaries</li>
+          <li>Monthly absence statistics</li>
+          <li>Annual leave tracking</li>
+          <li>Sick leave analysis</li>
+        </ul>
+      </div>
+      
+      <div class="feature-section">
+        <h2>⚙️ Settings</h2>
+        <p>Configure staff members, roles, and system preferences.</p>
+        
+        <h3>How to Access:</h3>
+        <div class="menu-path">Staff Rota → ⚙️ Settings</div>
+        
+        <h3>Configuration Options:</h3>
+        <ul>
+          <li>Add/edit staff members</li>
+          <li>Set annual leave entitlements</li>
+          <li>Configure shift types and codes</li>
+          <li>Manage email notifications</li>
+        </ul>
+      </div>
+      
+      <div class="feature-section">
+        <h2>🚀 Getting Started</h2>
+        <div class="steps">
+          <ol>
+            <li><strong>First Time Setup:</strong>
+              <ul>
+                <li>Go to <span class="highlight">⚙️ Settings</span> to add your staff members</li>
+                <li>Set annual leave entitlements for each staff member</li>
+              </ul>
+            </li>
+            <li><strong>Create Your First Rota:</strong>
+              <ul>
+                <li>Open <span class="highlight">🔄 Generate Monthly Rota</span></li>
+                <li>Set up monthly sheets for your desired months using the sheet creation tools</li>
+                <li>Apply shift patterns to populate your rotas with staff assignments</li>
+              </ul>
+            </li>
+            <li><strong>Manage Absences:</strong>
+              <ul>
+                <li>Use <span class="highlight">🏥 Log New Absence</span> to record any staff absences</li>
+                <li>Check <span class="highlight">📊 View Absence Reports</span> for summaries</li>
+              </ul>
+            </li>
+          </ol>
+        </div>
+        
+        <div class="tip">
+          <strong>💡 Pro Tip:</strong> The system automatically calculates hours worked, sick days, training days, and remaining annual leave for payroll purposes.
+        </div>
+      </div>
+      
+      <div class="feature-section">
+        <h2>❓ Need More Help?</h2>
+        <p>If you need additional assistance:</p>
+        <ul>
+          <li>Check the individual dialog help text within each feature</li>
+          <li>Review the <span class="highlight">🔒 Privacy Policy</span> for data handling information</li>
+          <li>Contact your system administrator for technical support</li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

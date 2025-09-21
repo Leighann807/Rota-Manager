@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      
+      body, html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        font-family: Arial, sans-serif;
+      }
+      
+      .container {
+        padding: 30px;
+        width: 100%;
+        min-height: 100vh;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      
+      .header h1 {
+        margin: 0 0 10px 0;
+        font-size: 28px;
+        color: #333;
+      }
+      
+      .header .subtitle {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 20px;
+      }
+      
+      .content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+      }
+      
+      .section {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border: 1px solid #e1e5e9;
+      }
+      
+      .section-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      
+      .section-title::before {
+        font-size: 20px;
+      }
+      
+      .section.staff .section-title::before {
+        content: "👥";
+      }
+      
+      .section.absence .section-title::before {
+        content: "📅";
+      }
+      
+      .section.privacy .section-title::before {
+        content: "🔒";
+      }
+      
+      .section.backup .section-title::before {
+        content: "💾";
+      }
+      
+      .info-text {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 15px;
+      }
+      
+      .form-group {
+        margin-bottom: 15px;
+      }
+      
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #333;
+      }
+      
+      .form-group input, .form-group select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+      }
+      
+      .form-group input:focus {
+        outline: none;
+        border-color: #4285f4;
+        box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.1);
+      }
+      
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      
+      .checkbox-group input[type="checkbox"] {
+        width: auto;
+        margin: 0;
+      }
+      
+      .button-group {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      
+      .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      }
+      
+      .btn-primary {
+        background-color: #4285f4;
+        color: white;
+      }
+      
+      .btn-primary:hover {
+        background-color: #3367d6;
+      }
+      
+      .btn-secondary {
+        background-color: #f5f5f5;
+        color: #333;
+        border: 1px solid #ddd;
+      }
+      
+      .btn-secondary:hover {
+        background-color: #e0e0e0;
+      }
+      
+      .btn-danger {
+        background-color: #dc3545;
+        color: white;
+      }
+      
+      .btn-danger:hover {
+        background-color: #c82333;
+      }
+      
+      .staff-list {
+        margin-top: 15px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+      
+      .staff-item {
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      .staff-item:last-child {
+        border-bottom: none;
+      }
+      
+      .staff-info {
+        flex-grow: 1;
+      }
+      
+      .staff-info .name {
+        font-weight: 500;
+        color: #333;
+      }
+      
+      .staff-info .details {
+        font-size: 13px;
+        color: #666;
+        margin-top: 2px;
+      }
+      
+      .staff-actions {
+        display: flex;
+        gap: 5px;
+      }
+      
+      .staff-actions .btn {
+        padding: 4px 8px;
+        font-size: 12px;
+        min-height: auto;
+      }
+      
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 1000;
+      }
+      
+      .modal-content {
+        background-color: white;
+        margin: 10% auto;
+        padding: 25px;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      }
+      
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+      }
+      
+      .modal-header h3 {
+        margin: 0;
+        color: #333;
+      }
+      
+      .close {
+        font-size: 24px;
+        font-weight: bold;
+        cursor: pointer;
+        color: #999;
+        line-height: 1;
+      }
+      
+      .close:hover {
+        color: #333;
+      }
+      
+      .footer {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      .status-message {
+        margin-top: 15px;
+        padding: 12px;
+        border-radius: 6px;
+        font-size: 14px;
+      }
+      
+      .success {
+        background-color: #d6f5d6;
+        color: #2e7d32;
+        border: 1px solid #4caf50;
+      }
+      
+      .error {
+        background-color: #ffcdd2;
+        color: #c62828;
+        border: 1px solid #f44336;
+      }
+      
+      .info {
+        background-color: #e3f2fd;
+        color: #1565c0;
+        border: 1px solid #2196f3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>⚙️ Settings</h1>
+        <div class="subtitle">Configure your Staff Rota Manager preferences</div>
+      </div>
+      
+      <div class="content">
+        <!-- Staff Management Section -->
+        <div class="section staff">
+          <div class="section-title">👥 Staff Management</div>
+          <div class="info-text">
+            Set up your team members for rota scheduling. Each staff member needs basic details and their annual leave entitlement.
+          </div>
+          
+          <!-- Step-by-step Guide -->
+          <div style="background: #f0f8ff; border: 1px solid #4285f4; border-radius: 6px; padding: 15px; margin: 15px 0;">
+            <div style="font-weight: 600; color: #1a73e8; margin-bottom: 10px;">📋 Getting Started:</div>
+            <ol style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.6;">
+              <li><strong>Add your first team member</strong> using the button below</li>
+              <li><strong>Enter their details:</strong> Name, email, role, and annual leave days</li>
+              <li><strong>Repeat for each team member</strong> - you can edit or remove them later</li>
+              <li><strong>Annual leave</strong> is set per person (some may have different entitlements)</li>
+            </ol>
+          </div>
+          
+          <div style="text-align: center; margin: 20px 0;">
+            <button class="btn btn-primary" id="addStaffButton" style="padding: 12px 30px; font-size: 16px; font-weight: 600;">
+              ➕ Add Your First Team Member
+            </button>
+          </div>
+
+          <div id="staffList" class="staff-list">
+            <!-- Staff list will be populated here -->
+          </div>
+          
+          <!-- Quick Stats -->
+          <div id="staffStats" style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-top: 15px; font-size: 14px; color: #666; text-align: center;">
+            <span id="staffCount">0</span> team members added
+          </div>
+        </div>
+
+        <!-- Annual Leave Settings Section -->
+        <div class="section absence">
+          <div class="section-title">Annual Leave Settings</div>
+          <div class="info-text">
+            Set default annual leave allowance for new staff members.
+          </div>
+          
+          <div class="form-group">
+            <label for="annualLeaveAllowanceInput">Annual Leave Allowance (days):</label>
+            <input type="number" id="annualLeaveAllowanceInput" value="25" min="0" max="365">
+            <div class="info-text">Default annual leave allowance for new staff members.</div>
+          </div>
+        </div>
+
+        <!-- Privacy & Analytics Section -->
+        <div class="section privacy">
+          <div class="section-title">Privacy & Data</div>
+          <div class="info-text">
+            Simple privacy controls for your peace of mind.
+          </div>
+          
+          <!-- Analytics Option -->
+          <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #4285f4;">
+            <div class="checkbox-group" style="margin-bottom: 8px;">
+              <input type="checkbox" id="analyticsEnabledCheckbox" checked>
+              <label for="analyticsEnabledCheckbox" style="font-weight: 500;">📊 Help improve this add-on</label>
+            </div>
+            <div style="font-size: 13px; color: #666; margin-left: 25px;">
+              Share anonymous usage data (like "how often rotas are created") to help make the add-on better. No personal info is shared.
+            </div>
+          </div>
+          
+          <!-- Notifications Option -->
+          <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #34a853;">
+            <div class="checkbox-group" style="margin-bottom: 8px;">
+              <input type="checkbox" id="notificationsEnabledCheckbox">
+              <label for="notificationsEnabledCheckbox" style="font-weight: 500;">🔔 Get update notifications</label>
+            </div>
+            <div style="font-size: 13px; color: #666; margin-left: 25px;">
+              Get notified about new features and important updates.
+            </div>
+          </div>
+          
+          <!-- Data Rights -->
+          <div style="border-top: 1px solid #eee; padding-top: 15px;">
+            <div style="font-weight: 500; margin-bottom: 12px; color: #333;">
+              🔐 Your Data Rights
+            </div>
+            <div class="button-group">
+              <button class="btn btn-secondary" id="exportDataButton" style="background: #e3f2fd; color: #1565c0; border-color: #bbdefb;">
+                📥 Download My Data
+              </button>
+              <button class="btn btn-danger" id="deleteDataButton" style="background: #ffebee; color: #c62828; border-color: #ffcdd2;">
+                🗑️ Delete My Settings
+              </button>
+            </div>
+            <div style="font-size: 12px; color: #666; margin-top: 8px;">
+              Download or delete your settings data. Your spreadsheets are never affected.
+            </div>
+          </div>
+        </div>
+
+        <!-- Backup & Export Section -->
+        <div class="section backup">
+          <div class="section-title">Backup & Export</div>
+          <div class="info-text">
+            Create backups of rota data or export for reporting purposes.
+          </div>
+          
+          <div class="button-group">
+            <button class="btn btn-secondary" id="backupButton">
+              💾 Create Backup
+            </button>
+            <button class="btn btn-secondary" id="exportRotaButton">
+              📊 Export Rota Data
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div id="statusMessage" style="display: none;" class="status-message"></div>
+      
+      <div class="footer">
+        <div style="font-size: 13px; color: #666;">
+          💡 Changes are saved automatically
+        </div>
+        <button class="btn btn-primary" id="saveSettingsButton">
+          ✅ Save All Settings
+        </button>
+      </div>
+
+      <!-- Staff Modal -->
+      <div id="staffModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 id="modalTitle">Add New Staff</h3>
+            <span class="close" onclick="closeStaffModal()">&times;</span>
+          </div>
+          <form id="staffForm">
+            <input type="hidden" id="staffId">
+            
+            <!-- Personal Details Section -->
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+              <div style="font-weight: 600; margin-bottom: 15px; color: #333;">👤 Personal Details</div>
+              <div class="form-group">
+                <label for="staffName">Full Name: <span style="color: #dc3545;">*</span></label>
+                <input type="text" id="staffName" required placeholder="e.g., John Smith">
+              </div>
+              <div class="form-group">
+                <label for="staffRole">Job Role/Position: <span style="color: #dc3545;">*</span></label>
+                <input type="text" id="staffRole" required placeholder="e.g., Nurse, Manager, Assistant">
+              </div>
+            </div>
+            
+            <!-- Annual Leave Section -->
+            <div style="background: #e8f5e8; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+              <div style="font-weight: 600; margin-bottom: 10px; color: #333;">📅 Annual Leave Entitlement</div>
+              <div style="font-size: 13px; color: #666; margin-bottom: 15px;">
+                Set this person's annual leave allowance for the current tax year. This can be different for each team member.
+              </div>
+              <div class="form-group">
+                <label for="staffAnnualLeave">Annual Leave Days: <span style="color: #dc3545;">*</span></label>
+                <input type="number" id="staffAnnualLeave" required min="0" max="365" value="25" placeholder="25">
+                <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                  💡 Tip: UK standard is usually 25-28 days. Part-time staff may have pro-rated entitlement.
+                </div>
+              </div>
+            </div>
+            <div class="button-group">
+              <button type="button" class="btn btn-secondary" onclick="closeStaffModal()">
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">
+                Save
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      // Global variables
+      let staffList = [];
+      let editingStaffId = null;
+      
+      // Initialize the page
+      document.addEventListener('DOMContentLoaded', function() {
+        // Set up event handlers
+        document.getElementById('saveSettingsButton').addEventListener('click', saveSettings);
+        document.getElementById('addStaffButton').addEventListener('click', () => showStaffModal());
+        document.getElementById('backupButton').addEventListener('click', createBackup);
+        document.getElementById('exportRotaButton').addEventListener('click', exportRotaData);
+        document.getElementById('staffForm').addEventListener('submit', handleStaffFormSubmit);
+        
+        // Privacy controls event handlers
+        const exportDataBtn = document.getElementById('exportDataButton');
+        const deleteDataBtn = document.getElementById('deleteDataButton');
+        
+        if (exportDataBtn) {
+          exportDataBtn.addEventListener('click', exportUserData);
+        }
+        
+        if (deleteDataBtn) {
+          deleteDataBtn.addEventListener('click', confirmDeleteUserData);
+        }
+        
+        // Load current settings
+        loadPrivacySettings();
+        loadStaffList();
+      });
+      
+      // Save settings
+      function saveSettings() {
+        const annualLeaveAllowance = document.getElementById('annualLeaveAllowanceInput').value;
+        const analyticsEnabled = document.getElementById('analyticsEnabledCheckbox').checked;
+        const notificationsEnabled = document.getElementById('notificationsEnabledCheckbox').checked;
+        
+        // Validate annual leave allowance
+        if (isNaN(annualLeaveAllowance) || annualLeaveAllowance < 0) {
+          showMessage('Please enter a valid annual leave allowance.', 'error');
+          return;
+        }
+        
+        showMessage('Saving settings...', 'info');
+        
+        // Save privacy settings
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              showMessage('Settings saved successfully!', 'success');
+            } else {
+              showMessage('Error saving settings: ' + result.message, 'error');
+            }
+          })
+          .withFailureHandler(function(error) {
+            showMessage('Error saving settings: ' + error.message, 'error');
+          })
+          .updatePrivacySettings({
+            analyticsEnabled: analyticsEnabled,
+            notificationsEnabled: notificationsEnabled,
+            annualLeaveAllowance: annualLeaveAllowance
+          });
+      }
+      
+      // Load current privacy settings
+      function loadPrivacySettings() {
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              const settings = result.settings;
+              document.getElementById('analyticsEnabledCheckbox').checked = settings.analyticsEnabled || false;
+              document.getElementById('notificationsEnabledCheckbox').checked = settings.notificationsEnabled || false;
+              document.getElementById('annualLeaveAllowanceInput').value = settings.annualLeaveAllowance || 25;
+            }
+          })
+          .withFailureHandler(function(error) {
+            console.log('Error loading privacy settings:', error);
+          })
+          .getPrivacySettings();
+      }
+      
+      // Export user data
+      function exportUserData() {
+        showMessage('Preparing data export...', 'info');
+        
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              // Create download link for the exported data
+              const dataStr = JSON.stringify(result.data, null, 2);
+              const dataBlob = new Blob([dataStr], {type: 'application/json'});
+              const url = URL.createObjectURL(dataBlob);
+              
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = `staff-rota-data-export-${new Date().toISOString().split('T')[0]}.json`;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              URL.revokeObjectURL(url);
+              
+              showMessage('Data exported successfully!', 'success');
+            } else {
+              showMessage('Error exporting data: ' + result.message, 'error');
+            }
+          })
+          .withFailureHandler(function(error) {
+            showMessage('Error exporting data: ' + error.message, 'error');
+          })
+          .exportUserData();
+      }
+      
+      // Confirm and delete user data
+      function confirmDeleteUserData() {
+        const confirmation = prompt(
+          'WARNING: This will permanently delete your user preferences and settings.\n\n' +
+          'Your spreadsheet data will NOT be affected.\n\n' +
+          'To confirm, type: DELETE_MY_DATA'
+        );
+        
+        if (confirmation === 'DELETE_MY_DATA') {
+          google.script.run
+            .withSuccessHandler(function(result) {
+              if (result.success) {
+                showMessage('Your data has been deleted successfully.', 'success');
+              } else {
+                showMessage('Error deleting data: ' + result.message, 'error');
+              }
+            })
+            .withFailureHandler(function(error) {
+              showMessage('Error deleting data: ' + error.message, 'error');
+            })
+            .deleteUserData(confirmation);
+        } else if (confirmation !== null) {
+          showMessage('Data deletion cancelled - incorrect confirmation code.', 'error');
+        }
+      }
+      
+      // Staff Management Functions
+      function loadStaffList() {
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              staffList = result.staff || [];
+              renderStaffList();
+            } else {
+              showMessage('Error loading staff list: ' + result.message, 'error');
+            }
+          })
+          .withFailureHandler(function(error) {
+            showMessage('Error loading staff list: ' + error.message, 'error');
+          })
+          .getStaffList();
+      }
+
+      function renderStaffList() {
+        const staffListElement = document.getElementById('staffList');
+        const staffCountElement = document.getElementById('staffCount');
+        const addButton = document.getElementById('addStaffButton');
+        
+        staffListElement.innerHTML = '';
+        
+        // Update staff count
+        staffCountElement.textContent = staffList.length;
+        
+        // Update button text based on whether staff exist
+        if (staffList.length === 0) {
+          addButton.innerHTML = '➕ Add Your First Team Member';
+          staffListElement.innerHTML = '<div style="text-align: center; color: #666; padding: 20px; background: #f8f9fa; border-radius: 6px; border: 2px dashed #ddd;">👥 No team members added yet.<br><br>Click the button above to add your first team member and get started!</div>';
+          return;
+        } else {
+          addButton.innerHTML = '➕ Add Another Team Member';
+        }
+
+        staffList.forEach(staff => {
+          const staffItem = document.createElement('div');
+          staffItem.className = 'staff-item';
+          const annualLeave = staff.annualLeave || 25; // Default to 25 if not set
+          
+          staffItem.innerHTML = `
+            <div class="staff-info">
+              <div class="name">👤 ${staff.name}</div>
+              <div class="details" style="margin-top: 4px;">
+                <div><strong>Role:</strong> ${staff.role}</div>
+                <div style="color: #4285f4;"><strong>📅 Annual Leave:</strong> ${annualLeave} days per year</div>
+              </div>
+            </div>
+            <div class="staff-actions">
+              <button class="btn btn-secondary" onclick="editStaff('${staff.id}')" title="Edit staff member">✏️ Edit</button>
+              <button class="btn btn-danger" onclick="deleteStaff('${staff.id}')" title="Remove staff member">🗑️ Remove</button>
+            </div>
+          `;
+          staffListElement.appendChild(staffItem);
+        });
+      }
+
+      function showStaffModal(staffId = null) {
+        const modal = document.getElementById('staffModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const form = document.getElementById('staffForm');
+        
+        editingStaffId = staffId;
+        modalTitle.textContent = staffId ? 'Edit Staff Member' : 'Add New Staff';
+        
+        if (staffId) {
+          const staff = staffList.find(s => s.id === staffId);
+          if (staff) {
+            document.getElementById('staffId').value = staff.id;
+            document.getElementById('staffName').value = staff.name;
+            document.getElementById('staffRole').value = staff.role;
+            document.getElementById('staffAnnualLeave').value = staff.annualLeave || 25;
+          }
+        } else {
+          form.reset();
+          document.getElementById('staffAnnualLeave').value = 25; // Set default
+        }
+        
+        modal.style.display = 'block';
+      }
+
+      function closeStaffModal() {
+        const modal = document.getElementById('staffModal');
+        modal.style.display = 'none';
+        editingStaffId = null;
+      }
+
+      function handleStaffFormSubmit(event) {
+        event.preventDefault();
+        
+        const staffData = {
+          id: document.getElementById('staffId').value,
+          name: document.getElementById('staffName').value,
+          role: document.getElementById('staffRole').value,
+          annualLeave: parseInt(document.getElementById('staffAnnualLeave').value) || 25
+        };
+
+        if (editingStaffId) {
+          updateStaff(staffData);
+        } else {
+          addStaff(staffData);
+        }
+      }
+
+      function addStaff(staffData) {
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              showMessage('Staff member added successfully!', 'success');
+              closeStaffModal();
+              loadStaffList();
+            } else {
+              showMessage('Error adding staff member: ' + result.message, 'error');
+            }
+          })
+          .withFailureHandler(function(error) {
+            showMessage('Error adding staff member: ' + error.message, 'error');
+          })
+          .addStaffMember(staffData);
+      }
+
+      function updateStaff(staffData) {
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              showMessage('Staff member updated successfully!', 'success');
+              closeStaffModal();
+              loadStaffList();
+            } else {
+              showMessage('Error updating staff member: ' + result.message, 'error');
+            }
+          })
+          .withFailureHandler(function(error) {
+            showMessage('Error updating staff member: ' + error.message, 'error');
+          })
+          .updateStaffMember(staffData);
+      }
+
+      function deleteStaff(staffId) {
+        if (confirm('Are you sure you want to delete this staff member?')) {
+          google.script.run
+            .withSuccessHandler(function(result) {
+              if (result.success) {
+                showMessage('Staff member deleted successfully!', 'success');
+                loadStaffList();
+              } else {
+                showMessage('Error deleting staff member: ' + result.message, 'error');
+              }
+            })
+            .withFailureHandler(function(error) {
+              showMessage('Error deleting staff member: ' + error.message, 'error');
+            })
+            .deleteStaffMember(staffId);
+        }
+      }
+
+      function editStaff(staffId) {
+        showStaffModal(staffId);
+      }
+      
+      // Create backup
+      function createBackup() {
+        showMessage('Creating backup...', 'info');
+        
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              showMessage('Backup created successfully! Check your Google Drive.', 'success');
+            } else {
+              showMessage('Error creating backup: ' + result.message, 'error');
+            }
+          })
+          .withFailureHandler(function(error) {
+            showMessage('Error creating backup: ' + error.message, 'error');
+          })
+          .createSpreadsheetBackup();
+      }
+      
+      // Export rota data
+      function exportRotaData() {
+        showMessage('Exporting rota data...', 'info');
+        
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              showMessage('Rota data exported successfully!', 'success');
+            } else {
+              showMessage('Error exporting rota data: ' + result.message, 'error');
+            }
+          })
+          .withFailureHandler(function(error) {
+            showMessage('Error exporting rota data: ' + error.message, 'error');
+          })
+          .exportRotaData();
+      }
+      
+      // Show message
+      function showMessage(message, type) {
+        const messageElement = document.getElementById('statusMessage');
+        messageElement.textContent = message;
+        messageElement.className = 'status-message ' + type;
+        messageElement.style.display = 'block';
+        
+        // Auto-hide success/info messages after 4 seconds
+        if (type === 'success' || type === 'info') {
+          setTimeout(function() {
+            messageElement.style.display = 'none';
+          }, 4000);
+        }
+      }
+      
+      // Close modal when clicking outside
+      window.onclick = function(event) {
+        const modal = document.getElementById('staffModal');
+        if (event.target === modal) {
+          closeStaffModal();
+        }
+      }
+    </script>
+  </body>
+</html>
