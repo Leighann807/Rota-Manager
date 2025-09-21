@@ -54,11 +54,68 @@ function onOpen() {
 - Menu appears as "Staff Rota" in Google Sheets menu bar
 - Container-bound script with proper triggers and permissions
 
-### 🔧 **Deployment Commands:**
+## 🚀 **Deployment & Version Control**
+
+### 📂 **Working Directory:**
+Always work from: `/mnt/c/Users/leigh/OneDrive/Coding Projects/Rota-Manager-main/target-project`
+
+### 🔧 **Google Apps Script Deployment:**
 ```bash
+# Navigate to target-project directory
 cd "/mnt/c/Users/leigh/OneDrive/Coding Projects/Rota-Manager-main/target-project"
+
+# Push to Google Apps Script
 cmd.exe /c "clasp push --force"
+
+# Pull from Google Apps Script (if needed)
+cmd.exe /c "clasp pull"
 ```
+
+**Apps Script Project URL:**
+https://script.google.com/u/0/home/projects/1uhijHgBKzTFLhBMU72KlR4cFBGmi1IDSlklU7yz0MmRqJ5_hX9K-8qrL/edit
+
+### 📝 **GitHub Repository Management:**
+```bash
+# Navigate to main project directory  
+cd "/mnt/c/Users/leigh/OneDrive/Coding Projects/Rota-Manager-main"
+
+# Pull latest changes from GitHub
+git pull origin main
+
+# Stage all changes
+git add .
+
+# Commit changes
+git commit -m "Your commit message
+
+🤖 Generated with Claude Code
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+
+# Push to GitHub (create new branch for features)
+git checkout -b feature-branch-name
+git push origin feature-branch-name
+
+# Or push to main branch
+git checkout main
+git push origin main
+```
+
+**GitHub Repository:**
+https://github.com/Leighann807/Rota-Manager.git
+
+### ⚙️ **Git Configuration:**
+The repository is configured with Windows Git credential manager:
+```bash
+git config credential.helper "/mnt/c/Program Files/Git/mingw64/bin/git-credential-manager.exe"
+```
+
+### 🔄 **Standard Workflow:**
+1. **Make changes** in `/target-project/` directory
+2. **Test changes** in Google Sheets
+3. **Deploy to Apps Script:** `clasp push --force`
+4. **Commit to Git:** Add, commit, and push to GitHub
+5. **Create Pull Request** if using feature branches
 
 ## 📂 **Project Structure**
 
